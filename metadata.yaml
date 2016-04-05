@@ -1,5 +1,5 @@
 _repo: Ulysses_4300
-_version: 0.0.1
+_version: 0.0.2
 covers:
 - attribution: nick fairbank - f9 design, 2015
   cover_type: original
@@ -26,7 +26,6 @@ identifiers:
   gutenberg: '4300'
 language: en
 production_note: EBook produced by Col Choat.
-publisher: Project Gutenberg
 publication_date: 2015-08-01
 publisher: Recovering the Classics
 rights: CC BY-NC
