@@ -1,0 +1,48 @@
+_repo: Ulysses_4300
+_version: 0.0.1
+covers:
+- attribution: nick fairbank - f9 design, 2015
+  cover_type: original
+  image_path: cover.jpg
+  rights: Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+  rights_url: https://creativecommons.org/licenses/by-nc/4.0/
+creator:
+  author:
+    agent_name: Joyce, James
+    birthdate: 1882
+    deathdate: 1941
+    gutenberg_agent_id: '1039'
+    url: http://www.gutenberg.org/2009/agents/1039
+    wikipedia: http://en.wikipedia.org/wiki/James_Joyce
+description: "This eBook is based on the pre-1923 print editions.\r\nCf. Wikipedia:\r\
+  \nhttp://en.wikipedia.org/wiki/Ulysses_(novel)"
+gutenberg_bookshelf:
+- Banned Books from Anne Haight's list
+- Best Books Ever Listings
+- Erotic Fiction
+gutenberg_issued: '2003-07-01'
+gutenberg_type: Text
+identifiers:
+  gutenberg: '4300'
+language: en
+production_note: EBook produced by Col Choat.
+publisher: Project Gutenberg
+publication_date: 2015-08-01
+publisher: Recovering the Classics
+rights: CC BY-NC
+rights_url: http://creativecommons.org/licenses/by-nc/4.0/
+subjects:
+- '!lcsh: City and town life -- Fiction'
+- '!lcsh: Domestic fiction'
+- '!lcc: PR'
+- '!lcsh: Jewish men -- Fiction'
+- '!lcsh: Male friendship -- Fiction'
+- '!lcsh: Artists -- Fiction'
+- '!lcsh: Married people -- Fiction'
+- '!lcsh: Psychological fiction'
+- '!lcsh: Epic literature'
+- '!lcsh: Alienation (Social psychology) -- Fiction'
+- '!lcsh: Dublin (Ireland) -- Fiction'
+- GITenberg
+title: Ulysses
+url: http://www.gutenberg.org/ebooks/4300
