@@ -1,5 +1,5 @@
 _repo: Ulysses_4300
-_version: 0.1.0
+_version: 0.1.1
 covers:
 - attribution: nick fairbank - f9 design, 2015
   cover_type: original
@@ -16,6 +16,8 @@ creator:
     wikipedia: http://en.wikipedia.org/wiki/James_Joyce
 description: "This eBook is based on the pre-1923 print editions.\r\nCf. Wikipedia:\r\
   \nhttp://en.wikipedia.org/wiki/Ulysses_(novel)"
+edition_identifiers:
+  edition_id: http://www.gutenberg.org/ebooks/4300#Ulysses
 gutenberg_bookshelf:
 - Banned Books from Anne Haight's list
 - Best Books Ever Listings
