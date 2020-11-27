@@ -5,6 +5,8 @@ Ulysses
 
 This is a git repository of the source files for the book Ulysses by Joyce, James. This book is in the Public Domain, see the LICENSE file for details.
 
+It was forked from https://github.com/GITenberg/Ulysses_4300 and updated with scripts for generating an annotated version of the book,  with annotations taken from http://m.joyceproject.com/
+
 Found an error?
 ===============
 If you find an error in a book in GITenberg, you can report it by clicking the Issues tab in this book’s repository. Please copy-and-paste the entire sentence that contains the error, and what the text should read. For advanced users, you can make a Pull Request on Github.  For more information and how to get involved see the CONTRIBUTING_ section of the GITenberg website.
