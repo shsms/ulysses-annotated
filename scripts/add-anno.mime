@@ -357,13 +357,24 @@ def insert_footnote(filename, id, epub) {
     note_b.replace("<h1>", "<font size=\"+1\"><em>" + id + ". ", 1)
     note_b.replace("</h1>", "</em></font>", 1)
     note_b.goto_pos(main_pos);
+    note_b.replace("—", "&mdash;")
+    note_b.goto_pos(main_pos);
     note_b.set_mark();
     note_b.find("</section>");
     note_b.rfind("</section>");
+    note_b.narrow_to_region();
+    note_b.start_of_buffer();
+    if(note_b.replace("<div id=\"note2\">", "") == 1) {
+	note_b.replace("</div>", "");
+    }
+    note_b.start_of_buffer();
+    note_b.set_mark();
+    note_b.end_of_buffer();
+    note_b.widen();
     var note = note_b.copy();
-    epub.paste(("<aside role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + id + "\">") +
+    epub.paste(("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + id + "\">") +
 	       note +
-	       ("<br/>Read more on <a href=\"http://m.joyceproject.com/"+filename+"\">joyceproject.com</a><br/>Back to <a href=\"#jpref" + id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</aside><hr>\n"));
+	       ("<br/>Read more on <a href=\"http://m.joyceproject.com/"+filename+"\">joyceproject.com</a><br/>Back to <a href=\"#jpref" + id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n"));
     return true;
 }
 
@@ -404,7 +415,6 @@ for (c : chapters) {
 	b.backward(4);
 	var text = b.copy();
 	total += 1;
-	// TODO overload find to take text objects
 	epub.use_cursor(main_cur);
 	// this phrase in chapter "penelope" comes at a different
 	// place in the epub than in the joyceproject version.
@@ -412,14 +422,14 @@ for (c : chapters) {
 	    epub.rfind("<p>");
 	}
 	if(epub.find_fuzzy(text)) {
-	    found += 1;
-	    var f_str = to_string(found);
+	    var f_str = to_string(found+1); // because found starts at 0.
 
-	    epub.use_cursor(main_cur);
-	    epub.paste("<sup><a id=\"jpref"+f_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +f_str+ "\">"+f_str+"</a></sup>");
-	    //print("text_found: (" + c + ") " + text);
 	    epub.use_cursor(notes_cur);
-	    insert_footnote(url, f_str, epub);
+	    if(insert_footnote(url, f_str, epub)) {
+		epub.use_cursor(main_cur);
+		epub.paste("<sup><a id=\"jpref"+f_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +f_str+ "\">"+f_str+"</a></sup>");
+		found += 1;
+	    }
 	} else {
 	    print("text not found: (" + c + ") " + text);
 	    not_found += 1;
