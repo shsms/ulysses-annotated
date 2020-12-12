@@ -10,16 +10,16 @@ The provided [go](https://golang.org/) program uses ![ideacrawler](https://githu
 
 - start the ideacrawler server:
 
-    git clone https://github.com/shsms/ideacrawler
-    cd ideacrawler
-    make build
-	build/ideacrawler
+		git clone https://github.com/shsms/ideacrawler
+		cd ideacrawler
+		make build
+		build/ideacrawler
 
 - run the download client in a second terminal:
 
-    cd ulysses-annotated/scripts
-	go get github.com/shsms/ideacrawler/goclient
-	go run dl-anno.go    ## (or run: make download)
+		cd ulysses-annotated/scripts
+		go get github.com/shsms/ideacrawler/goclient
+		go run dl-anno.go    ## (or run: make download)
 
 This would take some time,  but the files will get downloaded into `ulysses-annotated/scripts/annotations-raw`
 

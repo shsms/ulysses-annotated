@@ -20,8 +20,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ffilter := `joyceproject.com($|\/(chapters|notes)\/.*html?)`
-	cfilter := `\/(chapters|notes)\/`
+	ffilter := `joyceproject.com($|\/(index.php\?chapter|notes\/.*html?))`
+	cfilter := `\/(index.php\?chapter|notes\/.*html?)`
 
 	spec := gc.NewJobSpec(
 		gc.Depth(5),
@@ -39,7 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	z.AddPage("http://m.joyceproject.com", "")
+	z.AddPage("http://joyceproject.com", "")
 
 	for z.IsAlive() == true {
 		select {
@@ -57,7 +57,11 @@ func saveFile(ph *gc.PageHTML) {
 		return
 	}
 	filepath := "annotations-raw/" + path.Dir(u.Path)
-	fn := "annotations-raw/" + u.Path
+	suffix :=  u.Query().Get("chapter")
+	if len(suffix) > 0 {
+		suffix = "-" + suffix + ".htm"
+	}
+	fn := "annotations-raw/" + u.Path + suffix
 	log.Println(ph.Httpstatuscode, u.Path, path.Dir(u.Path), ph.UrlDepth)
 	os.MkdirAll(filepath, 0755)
 	ioutil.WriteFile(fn, ph.Content, 0755)
