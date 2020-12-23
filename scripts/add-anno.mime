@@ -108,38 +108,67 @@ def fix_mismatches(b, chapter) {
 
 def insert_footnote(filename, id, epub) {
     var note_b = buffer(basepath + "/" + filename);
-    if(note_b.empty() || note_b.find("<div id=\"note\">") < 0) {
+    if(note_b.empty()) {
 	return false;
     }
-    var main_pos = note_b.get_pos();
+    var title = "(title unknown)";
+    if(note_b.find("<title>") >= 0) {
+	note_b.set_mark();
+	if (!note_b.goto_pos(note_b.find("</title>"))) {
+	    print("error: title end tag not found: " + filename);
+	    return false;
+	}
+	title = to_string(note_b.copy());
+    } else {
+	print("warning: unable to find title for note: " + filename);
+    }
+    if(note_b.find("<div id=\"note\">") < 0) {
+	print("error: couldn't find starting point of note: " + filename);
+	return false;
+    }
+
+    note_b.set_mark();
+    note_b.goto_pos(note_b.find("</div>"));
+    note_b.narrow_to_region();
+
     while(note_b.find("<a") >= 0) {
 	note_b.backward(2);
 	note_b.set_mark();
 	note_b.find(">");
 	note_b.erase_region();
     }
-    note_b.goto_pos(main_pos);
+    note_b.start_of_buffer();
     note_b.replace("</a>", "");
-    note_b.goto_pos(main_pos);
-    note_b.goto_pos(main_pos);
+    
+    note_b.start_of_buffer();
+    note_b.replace("<br>", "");
+    
+    note_b.start_of_buffer();
     note_b.replace("—", "&mdash;")
-    
-    note_b.goto_pos(main_pos);
-    note_b.set_mark();
-    note_b.goto_pos(note_b.find("</div>"));
-    note_b.narrow_to_region();
-    
-    note_b.start_of_buffer();
-    if (note_b.replace("<p>", "<p>" + id + ". ", 1) == 0) {
-	note_b.paste("<p>" + id + ". ");
-	note_b.end_of_buffer();
-	note_b.paste("</p>");
-    }
-    note_b.start_of_buffer();
 
     // somefiles seem to have extra nested divs
     note_b.replace("<div id=\"note2\">", "");
     note_b.replace("<div id=\"note\">", "");
+
+    note_b.start_of_buffer();
+    if (note_b.find("<p>") < 0) {
+	note_b.paste("<p>");
+	note_b.end_of_buffer();
+	note_b.paste("</p>");
+    }
+
+    note_b.start_of_buffer();
+    if (note_b.find("<meta") >= 0) {
+	note_b.backward(5);
+	note_b.set_mark();
+	note_b.find(">");
+	note_b.erase_region();
+    }
+    note_b.start_of_buffer();
+    note_b.replace("</meta>", "");
+
+    note_b.start_of_buffer();
+    note_b.paste("<font size=\"+1\"><em>" + id + ". " + title + "</em></font>\n");
 
     note_b.start_of_buffer();
     note_b.set_mark();
