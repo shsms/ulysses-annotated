@@ -33,12 +33,14 @@ def fix_basics(b) {
 
     b.goto_pos(main_pos); b.replace("'",         "’");
     b.goto_pos(main_pos); b.replace(" <br />",   "");
-    b.goto_pos(main_pos); b.replace("<br />",    "");
+    b.goto_pos(main_pos); b.replace("<br />",    " ");
     b.goto_pos(main_pos); b.replace(" </i>",     "</i>");
+    b.goto_pos(main_pos); b.replace("</i>!",     "!</i>");
     b.goto_pos(main_pos); b.replace("em>",       "i>");
     b.goto_pos(main_pos); b.replace("<a/>",      "</a>");
     b.goto_pos(main_pos); b.replace("</a<",      "</a>");
     b.goto_pos(main_pos); b.replace("</i>\n<i>", "\n");
+    b.goto_pos(main_pos); b.replace("</i> \n<i>", "\n");
     b.goto_pos(main_pos); b.replace("&nbsp;",    "");
     b.goto_pos(main_pos); b.replace("&eacute;",  "é");
     b.goto_pos(main_pos); b.replace("&Eacute;",  "É");
@@ -56,273 +58,49 @@ def fix_basics(b) {
     }
 }
 
-// below are mismatches between joyceproject.com and gitenberg epub
-// among the annotated phrases from joyceproject.com. I don't want to
-// change the text in epub, so modifying downloaded joyceproject.com
-// files below, so they match with their corrosponding phrases.
 def fix_telem(b) {
-    b.replace("<font size=\"+2\">[1]</font>", "[ 1 ]", 1)
-    b.replace("<i>Thalatta! Thalatta</i>!", "<i>Thalatta! Thalatta!</i>", 1);
-    b.replace("his great searching eyes", "his grey searching eyes", 1);
-    b.replace("Dottyville with Conolly Norman", "Dottyville with Connolly Norman", 1);
-    b.replace("bowl of bitter waters.", "bowl of bitter waters.</a>", 1);
-    b.replace("feather fans", "featherfans", 1);
-    b.replace("No, mother.", "No, mother!", 1);
-    b.replace("briskly about the hearth to and fro", "briskly to and fro about the hearth", 1);
-
-    b.replace("three quarts is a shilling and one and two is two and two",
-	      "three quarts is a shilling. That’s a shilling and one and two is two and two", 1);
-
-    b.replace("base into the sea</i></a>,", "base into the sea,</i></a>", 1);
-    b.replace("I am the servant of two masters", "I am a servant of two masters", 1);
-    b.replace("et unam sanctam catholicam</i></a><a id=\"010115creed1\" class=\"box-images\" href=\"notes/010115creed.htm\"><i> et apostolicam
+     b.replace("bowl of bitter waters.", "bowl of bitter waters.</a>", 1);
+     b.replace("et unam sanctam catholicam</i></a><a id=\"010115creed1\" class=\"box-images\" href=\"notes/010115creed.htm\"><i> et apostolicam
 ecclesiam</i></a>:",
- 	      "et unam sanctam catholicam et apostolicam ecclesiam:</i></a>", 1);
-
-    b.replace("Uebermensch.</i></a>", "Übermensch.</i></a>", 1);
-}
-
-def fix_nestor(b) {
-    b.replace("<font size=\"+2\">[2]</font>", "[ 2 ]", 1);
-    b.replace("tartan filibegs",
-	      "tartan fillibegs", 1)
-
-    b.replace("lord Hastings’ Repulse, the duke of Westminster’s\nShotover, the duke of Beaufort’s Ceylon",
-	      "lord Hastings’ <i>Repulse</i>, the duke of Westminster’s <i>Shotover</i>, the duke of Beaufort’s <i>Ceylon</i>", 1);
-
-    b.replace("amid bawls of bookies on their pitches",
-	      "amid the bawls of bookies on their pitches", 1)
-    b.replace("money Fair Rebel: ten to one the field",
-	      "money <i>Fair Rebel.</i> Ten to one the field", 1)
-    b.replace("Emperor’s horses at Murzsteg",
-	      "Emperor’s horses at Mürzsteg", 1);
-    
-    b.replace("<i>The Evening Telegraph</i></a>...",
-	      "<i>&mdash;The Evening Telegraph...</i></a>", 1)
+  	      "et unam sanctam catholicam et apostolicam ecclesiam:</i></a>", 1);
 }
 
 def fix_proteus(b) {
-    b.replace("[3]", "[ 3 ]", 1);
-    b.replace("<i>Basta</i>!", "<i>Basta!</i>", 1);
-    b.replace("Hello! Kinch here. Put me",
-	      "Hello. Kinch here. Put me", 1);
-
-    b.replace("heresiarch. In a Greek watercloset he breathed his last: euthanasia.
-With beaded mitre and with crozier, stalled upon his throne, widower of
-a widowed see, with upstiffed omophorion",
-	      "heresiarch! In a Greek watercloset he breathed his last: <i>euthanasia</i>.
-With beaded mitre and with crozier, stalled upon his throne, widower of
-a widowed see, with upstiffed <i>omophorion</i>", 1);
-
-    b.replace("<i>All’erta</i>!", "<i>All’erta!</i>", 1);
-    b.replace("<i>descende</i>!", "<i>descende!</i>", 1);
-    b.replace("Get down, bald poll!", "Get down, baldpoll!", 1);
-    b.replace("<i>O si, certo</i>!", "<i>O si, certo!</i>", 1);
-    b.replace("Nother dying", "Mother dying", 1);
-    b.replace("flan breton", "flan bréton", 1);
-    b.replace("setier!", "sétier!", 1);
-    b.replace("nous, Irlande,</i></a>", "nous, Irlande,</a></i>", 1);
-    b.replace("Kilkenny are</i> <i>stout", "Kilkenny are stout", 1);
-    b.replace(" ensablé</i>, Louis", " ensablé</i> Louis", 1);
-    b.replace("safe among the bulrushes", "safe mong the bulrushes", 1);
-    b.replace("he woke me up</a> last night", "he woke me</a> last night", 1);
-}
-
-def fix_calypso(b) {
-    b.replace("<font size=\"+2\">[4]</font>", "[ 4 ]", 1);
-    b.replace("three, four : right", "three, four: right", 1);
-    b.replace("— Mkgnao!", "&mdash;Mkgnao!", 1);
-    b.replace("— Mn.", "&mdash;Mn.", 1);
-    b.replace("Eccles lane", "Eccles’ Lane", 1);
-    b.replace("Citron still alive in Saint", "Citron still in Saint", 1);
-    b.replace("Valuation is only twenty-eight", "Valuation is only twentyeight", 1);
-    b.replace("metempsychosis", "metamspychosis", 1);
-    b.replace("XL Cafe", "XL Café", 1);
-    b.replace("Funny, I don’t", "Funny I don’t", 1);
-}
-
-def fix_lotus(b) {
-    b.replace("<font size=\"+2\">[5]</font>", "[ 5 ]", 1);
-
-    b.replace("John Conmee S.J.
-on saint Peter Claver", "John Conmee S. J. on saint Peter Claver S. J.", 1);
-    b.replace("Peter Carey. No, Peter Claver", "Peter Carey, yes. No, Peter Claver", 1);
-    b.replace("Still Captain Buller", "Still Captain Culler", 1);
-}
-
-def fix_hades(b) {
-    b.replace("<font size=\"+2\">[6]</font>", "[ 6 ]", 1);
-    b.replace("slammed it tight till it",
-	      "slammed it twice till it", 1);
-
-    b.replace("Wallace Bros the\nbottleworks. Dodder bridge.",
-	      "Wallace Bros: the bottleworks: Dodder bridge.", 1);
-
-    b.replace("— Eight plums a penny!", "&mdash;Eight plums a penny!", 1);
-    b.replace("<i>Church Times</i></a>.", "<i>Church Times.</i></a>", 1);
-}
-
-def fix_aeolus(b) {
-    b.replace("<font size=\"+2\">[7]</font>", "[ 7 ]", 1);
-    b.replace("<i>Weekly Freeman</i></a><i>\nand National Press</i>",
-	      "<i>Weekly Freeman and National Press</i></a>", 1);
-    b.replace("Who the deuce scrawled all over these",
-	      "Who the deuce scrawled all over those", 1);
-    b.replace("<i>Sport’s</i> tissues", "<i>Sport</i>’s tissues", 1);
-    b.replace("threepenny bits and a sixpence",
-	      "threepenny bits and sixpences", 1);
-}
-
-def fix_lestry(b) {
-    b.replace("<font size=\"+2\">[8]</font>", "[ 8 ]", 1);
-    b.replace("L.s.d.", "£. s. d.", 1);
-    b.replace("U.P.: up", "U. p: up", 1);
-    b.replace("Express</i></a>.", "Express.</i></a>", 1);
-    b.replace("Home Rule
-sun rising up", "Homerule sun rising up", 1);
-    b.replace("— Not here.", "Not here.", 1);
-    b.replace("Spaton sawdust, sweetish warmish
-cigarette smoke", "Spat-on sawdust, sweetish warmish cigarettesmoke", 1);
-    b.replace("mustered and bred there", "musterred and bred there", 1);
-    b.replace("woman sculped Junonian", "women sculped Junonian", 1);
-}
-
-def fix_scylla(b) {
-    b.replace("<i>Homestead</i></a>.", "<i>Homestead.</i></a>", 1);
-}
-
-def fix_wrocks(b) {
-    b.replace("John Conmee S.J.", "John Conmee S. J.", 1);
-    b.replace("General Slocum explosion.", "<i>General Slocum</i> explosion.", 1);
-    b.replace("girl</i></a>.", "girl.</i></a>", 1);
-}
-
-def fix_sirens(b) {
-    b.replace("Naminedamine. All gone. All fallen.", "All gone. All fallen.", 1);
-    b.replace("to greaseaseabloom.", "to greaseabloom.", 1);
-    b.replace("the door of the
-diningroom", "the door of the bar and diningroom", 1);
-    b.replace("<i>Flora’s lips", "<i>to Flora’s lips", 1);
-    b.replace("Independent</i></a>,", "Independent,</i></a>", 1);
-    b.replace("Flood of warm jimjam", "Flood of warm jamjam", 1);
-    b.replace("U.
-P.: up", "U. P: up", 1);
-    b.replace("how solemn fell his footstep there", "how solemn fell his footsteps there", 1);
-    b.replace("Domini,</i> in God’s name. He", "Domini,</i> in God’s name he", 1);
-    b.replace("passed, repassed and, gently touching", "passed, reposed and, gently touching");
-    b.replace("Can leave that Freeman.", "Can leave that <i>Freeman</i>.", 1);
-}
-
-def fix_cyclops(b) {
-    b.replace("with u. p.: up on it", "with U. p: up on it", 1);
-    b.replace("a straw.</i>", "a straw</i>.", 1);
+     b.replace("nous, Irlande,</i></a>", "nous, Irlande,</a></i>", 1);
 }
 
 def fix_nausicaa(b) {
-    b.replace("the featherbed mountain</a>.", "Featherbed mountain.</a>", 1);
-    b.replace("the Gold Cup race!", "the Gold Cup races!", 1);
-    b.replace("<i>Leah,</i></a>", "<i>Leah,</a></i>", 1);
-    b.replace("<i>Cuckoo.
-     Cuckoo.
-     Cuckoo.</i></a>
-", "<i>Cuckoo Cuckoo Cuckoo.</i></a>", 1)
+    b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
 
 def fix_oxen(b) {
-    b.replace("all hardest of woman", "allhardest of woman", 1);
-    b.replace("sinned against the light", "sinned against my light", 1);
-    b.replace("from water of old Nile", "from waters of old Nile", 1);
     b.replace("printed and bound at the <a", "printed and bound at the</a> <a", 1)
-    b.replace("<i>Uebermensch</i>", "<i>Übermensch.</i>", 1);
-    b.replace("O,\nlust, our refuge and our strength.",
-	      "O lust our refuge and our strength.", 1);
-}
-
-def fix_circe(b) {
-    b.replace("U. p.: Up.</a>", "U. p: up.</a>", 1);
-    b.replace("Leah.</i> Mrs Bandmann Palmer", "Leah</i>, Mrs Bandmann Palmer", 1);
-    b.replace("A Titbits <i>back", "A</i> Titbits <i>back", 1);
-    b.replace("Berlin, W.13.", "Berlin, W. 13.", 1);
-    b.replace("S.J.</a>", "S. J.</a>", 1);
-    b.replace("Cuckoo.Cuckoo.", "Cuckoo. Cuckoo.", 1);
-    b.replace("<i>Cui bono</i>? But our buccaneering Vanderdeckens",
-	      "<i>Cui bono?</i> But our bucaneering Vanderdeckens", 1);
-    b.replace("Lorcan Sherlock, locum tenens.</a>",
-	      "Lorcan Sherlock,</i> locum tenens.</a><i>", 1);
-    b.replace("the Alleluia chorus</a>",
-	      "chorus from Handel’s Messiah</a>", 1);
-    b.replace("<i>teabrown artcolours</i>", "teabrown artcolours", 1);
-
-    b.replace("lights the Erin’s King sails</a>",
-	      "lights the</i> Erin’s King <i>sails</a>", 1);
-
-    b.replace("<i>Pater!</i> Free!", "<i>(He cries.) Pater!</i> Free!", 1);
-    b.replace("Yet I’ve a sort a",
-	      "Yet I’ve a sort of a", 1);
-    b.replace("<i>a plasterer’s bucket", "a plasterer’s bucket", 1);
 }
 
 def fix_eumaeus(b) {
-    b.replace("simply letting spurt a jet of spew", "simply letting spirt a jet of spew", 1);
-    b.replace("triangle, Miss Portinari, he", "triangle Miss Portinari he", 1);
-    b.replace("queen’s evidence&mdash;or king’s now&mdash;", "queen’s evidence or king’s now ", 1);
-    b.replace("indulge in any...", "indulge in any ", 1);
-    b.replace("the subject, and then, orthodox as", "the subject and then orthodox as", 1);
-    b.replace("you are... But in the economic, not touching religion, domain, the priest",
-    	      "you are. But in the economic, not touching religion, domain the priest", 1);
-
-    b.replace("edition, extra sporting, of the <i>Telegraph</i>, tell",
-	      "edition extra sporting of the <i>Telegraph</i> tell", 1);
-    b.replace("New York disaster, thousand", "New York disaster. thousand", 1);
-    b.replace("n&deg 9 Newbridge Avenue", "no 9 Newbridge Avenue", 1);
-    b.replace("ship of the street was\nmanoeuvring", "ship of the street was manœuvring", 1);
-}
-
-def fix_ithaca(b) {
-    b.replace("<i>Freeman’s Journal and
-National Press</i>", "Freeman’s Journal</i> and <i>National Press", 1);
-    b.replace("sir James\nW. Mackey Limited,", "sir James W. Mackey (Limited)", 1);
-    b.replace("c/o P. O.\nDolphin", "c/o. P. O. Dolphin", 1);
-    b.replace("reversed alphabetic boustrophedontic", "reversed alphabetic boustrophedonic", 1);
-    b.replace("N. IGS. /WI. UU. OX/W. OKS.\nMH/Y. IM", "N. IGS./WI. UU. OX/W. OKS. MH/Y. IM", 1);
-    b.replace("An ancient hagadah book", "An ancient haggadah book", 1);
+    b.replace("&deg 9", "&deg; 9", 1)
 }
 
 def fix_penelope(b) {
-    b.replace(">City Arms hotel</a>", "><i>City Arms</i> hotel</a>", 1);
-    b.replace("for &pound;10000 for a postcard up up", "for £ 10000 for a postcard U p up", 1);
-    b.replace("coming man Griffith is", "coming man Griffiths is", 1);
     b.replace("enteric fever<a id=\"010058bloodyswindle10\" class=\"box-images\" href=\"notes/010058bloodyswindle.htm\"> he", "enteric fever he", 1);
     b.replace("evening we kissed goodbye <a", "evening we kissed goodbye</a> <a", 1);
-    b.replace("deaead days beyond recall", "deaead days beyondre call", 1);
-    b.replace("the hour wait 2 oclock</a> well", "the hour wait two oclock</a> well", 1);
-    b.replace("he was a patent professor", "he was a potent professor", 1);
-    b.replace("strand bathing place", "strand bathingplace", 1);
-    b.replace("mi fa pietà Masetto", "mi fa pieta Masetto", 1);
-    b.replace("presto non son più forte", "presto non son piu forte", 1);
 }
 
 def fix_mismatches(b, chapter) {
     fix_basics(b);
     b.start_of_buffer();
+    var ch_num = to_string(chapter+1);
+    if(ch_num == "3") {
+	b.replace("[3]", "[ 3 ]", 1);
+    } else {
+	b.replace("<font size=\"+2\">["+ch_num+"]</font>", "[ "+ch_num+" ]", 1);
+    }
     switch(chapter) {
     case (0)  {fix_telem(b);	break;}
-    case (1)  {fix_nestor(b);	break;}
     case (2)  {fix_proteus(b);	break;}
-    case (3)  {fix_calypso(b);	break;}
-    case (4)  {fix_lotus(b);	break;}
-    case (5)  {fix_hades(b);	break;}
-    case (6)  {fix_aeolus(b);	break;}
-    case (7)  {fix_lestry(b);	break;}
-    case (8)  {fix_scylla(b);	break;}
-    case (9)  {fix_wrocks(b);	break;}
-    case (10) {fix_sirens(b);	break;}
-    case (11) {fix_cyclops(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
-    case (14) {fix_circe(b);	break;}
-    case (15) {fix_eumaeus(b);	break;}
-    case (16) {fix_ithaca(b);	break;}
+    case (15) {fix_eumaeus(b);  break;}
     case (17) {fix_penelope(b); break;}
     }
     b.start_of_buffer();
@@ -330,35 +108,71 @@ def fix_mismatches(b, chapter) {
 
 def insert_footnote(filename, id, epub) {
     var note_b = buffer(basepath + "/" + filename);
-    if(note_b.empty() || note_b.find("<div id=\"note\">") < 0) {
+    if(note_b.empty()) {
 	return false;
     }
-    var main_pos = note_b.get_pos();
+    var title = "(title unknown)";
+    if(note_b.find("<title>") >= 0) {
+	note_b.set_mark();
+	if (!note_b.goto_pos(note_b.find("</title>"))) {
+	    print("error: title end tag not found: " + filename);
+	    return false;
+	}
+	title = to_string(note_b.copy());
+    } else {
+	print("warning: unable to find title for note: " + filename);
+    }
+    if(note_b.find("<div id=\"note\">") < 0) {
+	print("error: couldn't find starting point of note: " + filename);
+	return false;
+    }
+
+    note_b.set_mark();
+    note_b.goto_pos(note_b.find("</div>"));
+    note_b.narrow_to_region();
+
     while(note_b.find("<a") >= 0) {
 	note_b.backward(2);
 	note_b.set_mark();
 	note_b.find(">");
 	note_b.erase_region();
     }
-    note_b.goto_pos(main_pos);
-    note_b.replace("</a>", "");
-    note_b.goto_pos(main_pos);
-    note_b.replace("<p>", "<p>" + id + ". ", 1)
-    note_b.goto_pos(main_pos);
-    note_b.replace("—", "&mdash;")
-    note_b.goto_pos(main_pos);
-    note_b.set_mark();
-    note_b.find("</div>");
-    note_b.rfind("</div>");
-    note_b.narrow_to_region();
     note_b.start_of_buffer();
-    if(note_b.replace("<div id=\"note2\">", "") == 1) {
-	note_b.replace("</div>", "");
+    note_b.replace("</a>", "");
+    
+    note_b.start_of_buffer();
+    note_b.replace("<br>", "");
+    
+    note_b.start_of_buffer();
+    note_b.replace("—", "&mdash;")
+
+    // somefiles seem to have extra nested divs
+    note_b.replace("<div id=\"note2\">", "");
+    note_b.replace("<div id=\"note\">", "");
+
+    note_b.start_of_buffer();
+    if (note_b.find("<p>") < 0) {
+	note_b.paste("<p>");
+	note_b.end_of_buffer();
+	note_b.paste("</p>");
     }
+
+    note_b.start_of_buffer();
+    if (note_b.find("<meta") >= 0) {
+	note_b.backward(5);
+	note_b.set_mark();
+	note_b.find(">");
+	note_b.erase_region();
+    }
+    note_b.start_of_buffer();
+    note_b.replace("</meta>", "");
+
+    note_b.start_of_buffer();
+    note_b.paste("<font size=\"+1\"><em>" + id + ". " + title + "</em></font>\n");
+
     note_b.start_of_buffer();
     note_b.set_mark();
     note_b.end_of_buffer();
-    note_b.widen();
     var note = note_b.copy();
     epub.paste(("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + id + "\">") +
 	       note +
@@ -366,9 +180,56 @@ def insert_footnote(filename, id, epub) {
     return true;
 }
 
-var epub = buffer("../4300-h/4300-h.htm", must_open)
+var epub = buffer("../4300-h/4300-h-updated.htm", must_open);
 var main_cur = epub.new_cursor();
 var notes_cur = epub.new_cursor();
+
+
+epub.use_cursor(main_cur);
+// add epub namespace so epub tags are recognized.
+epub.find("1999/xhtml\"");
+epub.paste(" xmlns:epub=\"http://www.idpf.org/2007/ops\"");
+
+// insert pagebreak css
+epub.find("p {");
+epub.next_line();
+epub.paste("div.pagebreak { page-break-after:always; }\n");
+
+
+epub.find("<pre xml:space=\"preserve\">");
+epub.set_mark();
+epub.goto_pos(epub.find("</pre>"));
+epub.erase_region();
+epub.paste("
+This is the annotated edition of Ulysses, by James Joyce.
+
+The body of the novel is derived from the Project Gutenberg eBook of
+Ulysses, the source files for which are available <a href=\"https://github.com/GITenberg/Ulysses_4300\">here</a>, under the
+terms of the Gutenberg License, which can be found <a href=\"http://www.gutenberg.org/policy/license.html\">here</a>.
+
+The annotations in this ebook are excerpts automatically generated
+from longer notes on <a href=\"http://joyceproject.com\">joyceproject.com</a> with the permission of the
+site's creator and curator, John Hunt. Under the terms of a Creative
+Commons license, his work may be freely copied and distributed if
+three conditions are met: no commercial uses, no alterations, and full
+attribution.
+
+Detailed instructions for generating this annotated ebook can be found
+<a href=\"https://github.com/shsms/ulysses-annotated/blob/master/annotations.md\">here</a>.
+
+
+Last Updated: December 23, 2020.
+
+
+
+
+");
+
+epub.find("</pre>");
+epub.paste("<hr/>");
+
+epub.paste(buffer("foreword.htm").get_contents());
+epub.paste("<div class=\"pagebreak\"></div>");
 
 // move notes_cur to end of novel text. notes will be inserted there.
 epub.use_cursor(notes_cur);
@@ -376,13 +237,10 @@ epub.find("End of the Project Gutenberg EBook of Ulysses, by James Joyce");
 epub.rfind("<pre");
 var end_pos = epub.get_pos();
 // add a page break followed by the Annotations heading.
-epub.paste("<div style=\"height: 4em;\"><br /><br /><br /><br /></div><h2>Annotations</h2>");
-
+epub.paste("<div class=\"pagebreak\"></div>\n\n<h2>Annotations</h2>");
 
 epub.use_cursor(main_cur);
-// add epub namespace so epub tags are recognized.
-epub.find("1999/xhtml\"");
-epub.paste(" xmlns:epub=\"http://www.idpf.org/2007/ops\"");
+
 // go just after toc.
 epub.find("<a name=\"link2HCH0001\" id=\"link2HCH0001\">");
 epub.set_mark();
