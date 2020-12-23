@@ -4,7 +4,7 @@ All these steps below were verified to work on [Manjaro](https://manjaro.org/), 
 
 ## Download files from joyceproject
 
-The provided [go](https://golang.org/) program uses ![ideacrawler](https://github.com/shsms/ideacrawler) to download the annotations.  To run,
+The provided [go](https://golang.org/) program uses [ideacrawler](https://github.com/shsms/ideacrawler) to download the annotations.  To run,
 
 - install a recent go compiler from https://golang.org
 
@@ -25,36 +25,30 @@ This would take some time,  but the files will get downloaded into `ulysses-anno
 
 ## Download and build mime
 
-![Mime](https://github.com/shsms/mime) is a text processing framework that we use for adding annotations to the epub source file,  from the joyceproject files downloaded in the previous step.  Mime is written in C++ and you need a C++ compiler to build it.  It currently works only on linux.
+[Mime](https://github.com/shsms/mime) is a text processing framework that we use for adding annotations to the epub source file,  from the joyceproject files downloaded in the previous step.  Mime is written in C++ and you need a C++ compiler to build it.  It currently works only on linux.
 
     git clone https://github.com/shsms/mime
 	cd mime
 	make init
 	make build install -j
 
-## Run the provided mime script
+## Run the provided mime scripts
 
 	cd ulysses-annotated/scripts
-    mime add-anno.mime   ## (or run:  make addanno)
+	make addanno
 
 This step would generate an annotated html file in `ulysses-annotated/4300-h/4300-h-annotated.htm`
 
 ## Generate epub from the annotated html file
 
-For this step,  we use the ![ebookmaker](https://github.com/gutenbergtools/ebookmaker) tool from Project Gutenberg.  Along with ebookmaker,  we also have to install its prerequisites.  On Manjaro,  these can be installed using:
+For this step,  we use the [ebookmaker](https://github.com/gutenbergtools/ebookmaker) tool from Project Gutenberg.  Along with ebookmaker,  we also have to install its prerequisites.  On Manjaro,  these can be installed using:
 
 	sudo pacman -S tidy calibre
 	pip install ebookmaker pytidylib
 
 Then you can generate the epub using the below command:
 
-	ebookmaker \
-		--make epub.images \
-		--output-file ../4300-h/4300-h-annotated.epub \
-		--cover ../cover.jpg \
-		../4300-h/4300-h-annotated.htm
-
-	## (or run: make epub)
+	make epub
 
 This step is likely to print a number of warnings related to proprietary tags in the source file.  These tags are required for the pop-up footnotes we use to display the annotations.  It will also print warnings about the presence of URLs to external sites.  These are URLs to annotations pages on joyceproject.com,  that we can visit to read more and for pictures relating to any annotation.
 
