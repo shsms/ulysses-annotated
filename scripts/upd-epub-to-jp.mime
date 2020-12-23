@@ -1,0 +1,518 @@
+// -*- js -*-
+
+def update(b, from, to) {
+    var start = b.find_fuzzy(from);
+    if(start == -1) {
+	print("failed: " + from);
+	return false;
+    }
+    var end = b.get_pos();
+
+    var ex_start = start - 20;
+    var ex_end = end + 20;
+
+    b.goto_pos(ex_start);
+    b.set_mark();
+    b.goto_pos(ex_end);
+    var from_r = b.copy();
+
+    b.goto_pos(start);
+    b.set_mark();
+    b.goto_pos(end);
+    b.erase_region();
+    b.paste(to);
+
+    b.forward(20);
+    b.set_mark();
+    b.goto_pos(ex_start);
+    var to_r = b.copy();
+
+    // print("Text: " + from +
+    // 	  "\nFrom_text:\n" + from_r +
+    // 	  "\nTo_text:\n" + to_r +
+    // 	  "\n--------------------\n");
+    return true;
+}
+
+class diff {
+    var from;
+    var to;
+    def diff(from, to) {this.from = from; this.to = to; }
+};
+
+var items = [
+    diff(
+	"his grey searching eyes",
+	"his great searching eyes"),
+
+    diff(
+	"Dottyville with Connolly Norman",
+	"Dottyville with Conolly Norman"),
+
+    diff(
+	"featherfans",
+	"feather fans"),
+
+    diff(
+	"No, mother!",
+	"No, mother."),
+
+    diff(
+	"briskly to and fro about the hearth",
+	"briskly about the hearth to and fro"),
+
+    diff(
+	"three quarts is a shilling. That’s a shilling and one and two is two and two",
+	"three quarts is a shilling and one and two is two and two"),
+
+    diff(
+	"base into the sea,</i>",
+	"base into the sea</i>,"),
+
+    diff(
+	"I am a servant of two masters",
+	"I am the servant of two masters"),
+
+    diff(
+	"Übermensch.",
+	"Uebermensch."),
+
+    diff(
+	"tartan fillibegs",
+	"tartan filibegs"),
+
+    diff(
+	"lord Hastings’ <i>Repulse</i>, the duke of Westminster’s <i>Shotover</i>, the duke of Beaufort’s <i>Ceylon</i>",
+	"lord Hastings’ Repulse, the duke of Westminster’s\nShotover, the duke of Beaufort’s Ceylon"),
+
+    diff(
+	"amid the bawls of bookies on their pitches",
+	"amid bawls of bookies on their pitches"),
+
+    diff(
+	"money <i>Fair Rebel.</i> Ten to one the field",
+	"money Fair Rebel: ten to one the field"),
+
+    diff(
+	"Emperor’s horses at Mürzsteg",
+	"Emperor’s horses at Murzsteg"),
+
+    diff(
+	"<i>&mdash;The Evening Telegraph...</i>",
+	"<i>The Evening Telegraph</i>..."),
+
+    diff(
+	"Hello. Kinch here. Put me",
+	"Hello! Kinch here. Put me"),
+
+    diff(
+	"heresiarch! In a Greek watercloset he breathed his last: <i>euthanasia</i>.
+With beaded mitre and with crozier, stalled upon his throne, widower of
+a widowed see, with upstiffed <i>omophorion</i>",
+    "heresiarch. In a Greek watercloset he breathed his last: euthanasia.
+With beaded mitre and with crozier, stalled upon his throne, widower of
+a widowed see, with upstiffed omophorion"),
+
+    diff(
+	"Get down, baldpoll!",
+	"Get down, bald poll!"),
+
+    diff(
+	"Mother dying",
+	"Nother dying"),
+
+    diff(
+	"flan bréton",
+	"flan breton"),
+
+    diff(
+	"sétier!",
+	"setier!"),
+
+    diff(
+	"Kilkenny are stout",
+	"Kilkenny are</i> <i>stout"),
+
+    diff(
+	" ensablé</i> Louis",
+	" ensablé</i>, Louis"),
+
+    diff(
+	"safe mong the bulrushes",
+	"safe among the bulrushes"),
+
+    diff(
+	"he woke me last night",
+	"he woke me up last night"),
+
+    diff(
+	"three, four: right",
+	"three, four : right"),
+
+    diff(
+	"Eccles’ Lane",
+	"Eccles lane"),
+
+    diff(
+	"Citron still in Saint",
+	"Citron still alive in Saint"),
+
+    diff(
+	"Valuation is only twentyeight",
+	"Valuation is only twenty-eight"),
+
+    diff(
+	"metamspychosis",
+	"metempsychosis"),
+
+    diff(
+	"XL Café",
+	"XL Cafe"),
+
+    diff(
+	"Funny I don’t",
+	"Funny, I don’t"),
+
+    diff(
+	"John Conmee S. J. on saint Peter Claver S. J.",
+    "John Conmee S.J.
+on saint Peter Claver"),
+
+    diff(
+	"Peter Carey, yes. No, Peter Claver",
+	"Peter Carey. No, Peter Claver"),
+
+    diff(
+	"Still Captain Culler",
+	"Still Captain Buller"),
+
+    diff(
+	"slammed it twice till it",
+	"slammed it tight till it"),
+
+    diff(
+	"Wallace Bros: the bottleworks: Dodder bridge.",
+	"Wallace Bros the\nbottleworks. Dodder bridge."),
+
+    diff(
+	"<i>Church Times.</i>",
+	"<i>Church Times</i>."),
+
+    diff(
+	"<i>Weekly Freeman and National Press</i>",
+	"<i>Weekly Freeman</i><i>\nand National Press</i>"),
+
+    diff(
+	"Who the deuce scrawled all over those",
+	"Who the deuce scrawled all over these"),
+
+    diff(
+	"<i>Sport</i>’s tissues",
+	"<i>Sport’s</i> tissues"),
+
+    diff(
+	"threepenny bits and sixpences",
+	"threepenny bits and a sixpence"),
+
+    diff(
+	"£. s. d.",
+	"L.s.d."),
+
+    diff(
+	"U. p: up",
+	"U.P.: up"),
+
+    diff(
+	"Express.</i>",
+	"Express</i>."),
+
+    diff(
+	"Homerule sun rising up",
+    "Home Rule
+sun rising up"),
+
+    diff(
+	"Spat-on sawdust, sweetish warmish cigarettesmoke",
+	"Spaton sawdust, sweetish warmish cigarette smoke"),
+
+    diff(
+	"musterred and bred there",
+	"mustered and bred there"),
+
+    diff(
+	"women sculped Junonian",
+	"woman sculped Junonian"),
+
+    diff(
+	"<i>Homestead.</i>",
+	"<i>Homestead</i>."),
+
+    diff(
+	"John Conmee S. J.",
+	"John Conmee S.J."),
+
+    diff(
+	"<i>General Slocum</i> explosion.",
+	"General Slocum explosion."),
+
+    diff(
+	"girl.</i>",
+	"girl</i>."),
+
+    diff(
+	"All gone. All fallen.",
+	"Naminedamine. All gone. All fallen."),
+
+    diff(
+	"to greaseabloom.",
+	"to greaseaseabloom."),
+
+    diff(
+	"the door of the bar and diningroom",
+    "the door of the
+diningroom"),
+
+    diff(
+	"<i>to Flora’s lips",
+	"<i>Flora’s lips"),
+
+    diff(
+	"Independent,</i>",
+	"Independent</i>,"),
+
+    diff(
+	"Flood of warm jamjam",
+	"Flood of warm jimjam"),
+
+    diff(
+	"U. P: up",
+    "U.
+P.: up"),
+
+    diff(
+	"how solemn fell his footsteps there",
+	"how solemn fell his footstep there"),
+
+    diff(
+	"Domini,</i> in God’s name he",
+	"Domini,</i> in God’s name. He"),
+
+    diff(
+	"passed, reposed and, gently touching",
+	"passed, repassed and, gently touching"),
+
+    diff(
+	"Can leave that <i>Freeman</i>.",
+	"Can leave that Freeman."),
+
+    diff(
+	"with U. p: up on it",
+	"with u. p.: up on it"),
+
+    diff(
+	"a straw</i>.",
+	"a straw.</i>"),
+
+    diff(
+	"Featherbed mountain.",
+	"the featherbed mountain."),
+
+    diff(
+	"the Gold Cup races!",
+	"the Gold Cup race!"),
+
+    diff(
+	"<i>Cuckoo Cuckoo Cuckoo.</i>",
+	"<i>Cuckoo. Cuckoo. Cuckoo.</i>"),
+
+    diff(
+	"allhardest of woman",
+	"all hardest of woman"),
+
+    diff(
+	"sinned against my light",
+	"sinned against the light"),
+
+    diff(
+	"from waters of old Nile",
+	"from water of old Nile"),
+
+    diff(
+	"<i>Übermensch.</i>",
+	"<i>Uebermensch</i>"),
+
+    diff(
+	"O lust our refuge and our strength.",
+	"O,\nlust, our refuge and our strength."),
+
+    diff(
+	"U. p: up.",
+	"U. p.: Up."),
+
+    diff(
+	"Leah</i>, Mrs Bandmann Palmer",
+	"Leah.</i> Mrs Bandmann Palmer"),
+
+    diff(
+	". A</i> Titbits <i>back",
+	".</i> A Titbits <i>back"),
+
+    diff(
+	"Berlin, W. 13.",
+	"Berlin, W.13."),
+
+    diff(
+	"S. J.",
+	"S.J."),
+
+    diff(
+	"<i>Cui bono?</i> But our bucaneering Vanderdeckens",
+	"<i>Cui bono</i>? But our buccaneering Vanderdeckens"),
+
+    diff(
+	"Lorcan Sherlock,</i> locum tenens. <i>",
+	"Lorcan Sherlock, locum tenens. "),
+
+    diff(
+	"chorus from Handel’s Messiah",
+	"the Alleluia chorus"),
+
+    diff(
+	"teabrown artcolours",
+	"</i> <i>teabrown artcolours</i> <i>"),
+
+    diff(
+	"lights the</i> Erin’s King <i>sails",
+	"lights the Erin’s King sails"),
+
+    diff(
+	"<i>(He cries.) Pater!</i> Free!",
+	"<i>Pater!</i> Free!"),
+
+    diff(
+	"Yet I’ve a sort of a",
+	"Yet I’ve a sort a"),
+
+    diff(
+	"a plasterer’s bucket",
+	"</i> <i>a plasterer’s bucket"),
+
+    diff(
+	"simply letting spirt a jet of spew",
+	"simply letting spurt a jet of spew"),
+
+    diff(
+	"triangle Miss Portinari he",
+	"triangle, Miss Portinari, he"),
+
+    diff(
+	"queen’s evidence or king’s now like",
+	"queen’s evidence&mdash;or king’s now&mdash;like"),
+
+    diff(
+	"indulge in any ",
+	"indulge in any..."),
+
+    diff(
+	"the subject and then orthodox as",
+	"the subject, and then, orthodox as"),
+
+    diff(
+	"you are. But in the economic, not touching religion, domain the priest",
+	"you are... But in the economic, not touching religion, domain, the priest"),
+
+    diff(
+	"edition extra sporting of the <i>Telegraph</i> tell",
+	"edition, extra sporting, of the <i>Telegraph</i>, tell"),
+
+    diff(
+	"New York disaster. thousand",
+	"New York disaster, thousand"),
+
+    diff(
+	"no 9 Newbridge Avenue",
+	"n&deg; 9 Newbridge Avenue"),
+
+    diff(
+	"ship of the street was manœuvring",
+	"ship of the street was\nmanoeuvring"),
+
+    diff(
+	"Freeman’s Journal</i> and <i>National Press",
+    "</i> <i>Freeman’s Journal and
+National Press</i> <i>"),
+
+    diff(
+	"sir James W. Mackey (Limited)",
+	"sir James W. Mackey Limited,"),
+
+    diff(
+	"c/o. P. O. Dolphin",
+	"c/o P. O.\nDolphin"),
+
+    diff(
+	"reversed alphabetic boustrophedonic",
+	"reversed alphabetic boustrophedontic"),
+
+    diff(
+	"N. IGS./WI. UU. OX/W. OKS. MH/Y. IM",
+	"N. IGS. /WI. UU. OX/W. OKS.\nMH/Y. IM"),
+
+    diff(
+	"An ancient haggadah book",
+	"An ancient hagadah book"),
+
+    diff(
+	"<i>City Arms</i> hotel",
+	"City Arms hotel"),
+
+    diff(
+	"for £ 10000 for a postcard U p up",
+	"for &pound;10000 for a postcard up up"),
+
+    diff(
+	"coming man Griffiths is",
+	"coming man Griffith is"),
+
+    // diff(
+    // "evening we kissed goodbye <a",
+    // "evening we kissed goodbye <a"),
+
+    diff(
+	"deaead days beyondre call",
+	"deaead days beyond recall"),
+
+    diff(
+	"the hour wait two oclock well",
+	"the hour wait 2 oclock well"),
+
+    diff(
+	"he was a potent professor",
+	"he was a patent professor"),
+
+    diff(
+	"strand bathingplace",
+	"strand bathing place"),
+
+    diff(
+	"mi fa pieta Masetto",
+	"mi fa pietà Masetto"),
+
+    diff(
+	"presto non son piu forte",
+	"presto non son più forte")
+]
+
+
+var epub = buffer("../4300-h/4300-h.htm", must_open);
+
+var success = true;
+for(i : items) {
+    if (!update(epub, i.from, i.to)) {
+	success = false;
+    }
+}
+
+if(success) {
+    epub.save_as("../4300-h/4300-h-updated.htm");
+}

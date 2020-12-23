@@ -4,6 +4,7 @@ download:
 	go run dl-anno.go
 
 addanno:
+	mime upd-epub-to-jp.mime
 	mime add-anno.mime
 
 epub:
