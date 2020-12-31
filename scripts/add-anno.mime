@@ -3,7 +3,15 @@
 // this is a chaiscript file, but there is no wide syntax highlighting
 // support for it yet, and js-mode is a close approximation.
 
-global basepath = "annotations-raw"
+def parseargs() {
+    var parser = args_parser();
+    parser.string_opt("d,date", "date for the last_updated field")
+    return parser.parse();
+}
+
+var args = parseargs();
+
+global basepath = "annotations-raw";
 
 var chapters = [
     "/index.php-telem.htm",
@@ -106,7 +114,7 @@ def fix_mismatches(b, chapter) {
     b.start_of_buffer();
 }
 
-def insert_footnote(filename, id, epub) {
+def insert_footnote(filename, note_id, note_ref_id, epub) {
     var note_b = buffer(basepath + "/" + filename);
     if(note_b.empty()) {
 	return false;
@@ -139,6 +147,12 @@ def insert_footnote(filename, id, epub) {
     }
     note_b.start_of_buffer();
     note_b.replace("</a>", "");
+
+    note_b.start_of_buffer();
+    note_b.replace("<em><em>", "<em>");
+
+    note_b.start_of_buffer();
+    note_b.replace("</em></em>", "</em>");
     
     note_b.start_of_buffer();
     note_b.replace("<br>", "");
@@ -151,7 +165,7 @@ def insert_footnote(filename, id, epub) {
     note_b.replace("<div id=\"note\">", "");
 
     note_b.start_of_buffer();
-    if (note_b.find("<p>") < 0) {
+    if (note_b.find(regex("<p[ >]")) < 0) {
 	note_b.paste("<p>");
 	note_b.end_of_buffer();
 	note_b.paste("</p>");
@@ -168,15 +182,15 @@ def insert_footnote(filename, id, epub) {
     note_b.replace("</meta>", "");
 
     note_b.start_of_buffer();
-    note_b.paste("<font size=\"+1\"><em>" + id + ". " + title + "</em></font>\n");
+    note_b.paste("<font size=\"+1\"><em>" + note_id + ". " + title + "</em></font>\n");
 
     note_b.start_of_buffer();
     note_b.set_mark();
     note_b.end_of_buffer();
     var note = note_b.copy();
-    epub.paste(("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + id + "\">") +
+    epub.paste(("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">") +
 	       note +
-	       ("<br/>Read more on <a href=\"http://joyceproject.com/"+filename+"\">joyceproject.com</a><br/>Back to <a href=\"#jpref" + id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n"));
+	       ("<br/>Read more on <a href=\"http://joyceproject.com/"+filename+"\">joyceproject.com</a><br/>Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n"));
     return true;
 }
 
@@ -193,51 +207,46 @@ epub.paste(" xmlns:epub=\"http://www.idpf.org/2007/ops\"");
 // insert pagebreak css
 epub.find("p {");
 epub.next_line();
-epub.paste("div.pagebreak { page-break-after:always; }\n");
+epub.paste("p.pagebreak { page-break-after:always; }\n");
+global pagebreak = "<p class=\"pagebreak\"></p>";
 
+epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
+epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
 
-epub.find("<pre xml:space=\"preserve\">");
+epub.goto_pos(epub.find("<pre xml:space=\"preserve\">"));
 epub.set_mark();
-epub.goto_pos(epub.find("</pre>"));
-epub.erase_region();
-epub.paste("
-This is the annotated edition of Ulysses, by James Joyce.
-
-The body of the novel is derived from the Project Gutenberg eBook of
-Ulysses, the source files for which are available <a href=\"https://github.com/GITenberg/Ulysses_4300\">here</a>, under the
-terms of the Gutenberg License, which can be found <a href=\"http://www.gutenberg.org/policy/license.html\">here</a>.
-
-The annotations in this ebook are excerpts automatically generated
-from longer notes on <a href=\"http://joyceproject.com\">joyceproject.com</a> with the permission of the
-site's creator and curator, John Hunt. Under the terms of a Creative
-Commons license, his work may be freely copied and distributed if
-three conditions are met: no commercial uses, no alterations, and full
-attribution.
-
-Detailed instructions for generating this annotated ebook can be found
-<a href=\"https://github.com/shsms/ulysses-annotated/blob/master/annotations.md\">here</a>.
-
-
-Last Updated: December 23, 2020.
-
-
-
-
-");
-
 epub.find("</pre>");
-epub.paste("<hr/>");
+epub.erase_region();
 
-epub.paste(buffer("foreword.htm").get_contents());
-epub.paste("<div class=\"pagebreak\"></div>");
+var firstpage = buffer("firstpage.htm");
+firstpage.replace("%lastupdated%", args.date);
+epub.paste(firstpage.get_contents());
+epub.paste(pagebreak);
+
+var author_start = epub.find_fuzzy("<h2> by James Joyce </h2>");
+epub.set_mark();
+epub.goto_pos(author_start);
+epub.erase_region();
+epub.paste("<h3>by James Joyce</h3>");
+
+epub.find("<div class=\"toc\">");
+epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />")
+
+epub.find("<a name=\"link2H_4_0001\" id=\"link2H_4_0001\">");
+epub.rfind("<p>");
+epub.paste(buffer("preface.htm").get_contents());
+epub.paste(pagebreak);
 
 // move notes_cur to end of novel text. notes will be inserted there.
 epub.use_cursor(notes_cur);
 epub.find("End of the Project Gutenberg EBook of Ulysses, by James Joyce");
 epub.rfind("<pre");
+epub.set_mark();
+epub.find("</pre>");
+epub.erase_region();
 var end_pos = epub.get_pos();
 // add a page break followed by the Annotations heading.
-epub.paste("<div class=\"pagebreak\"></div>\n\n<h2>Annotations</h2>");
+epub.paste(pagebreak + "\n\n<h2>Annotations</h2>");
 
 epub.use_cursor(main_cur);
 
@@ -255,6 +264,11 @@ var not_found = 0;
 for (var chapter = 0; chapter < 18; ++chapter) {
     var b = buffer(basepath+chapters[chapter]);
 
+    epub.use_cursor(notes_cur);
+    epub.paste(pagebreak + "<h3>[ " + to_string(chapter+1) + " ]</h3>");
+
+    var note_num = 1;
+
     fix_mismatches(b, chapter);
 
     b.find("class=\"newchapter\"");
@@ -265,14 +279,12 @@ for (var chapter = 0; chapter < 18; ++chapter) {
     b.start_of_buffer();
     while(b.find("href=\"") >= 0) {
 	b.set_mark();
-	b.find("\"");
-	b.backward(1);
-	var url = to_string(b.copy());
+	b.goto_pos(b.find("\""));
+	var url = b.copy();
 
 	b.find(">");
 	b.set_mark();
-	b.find("</a>");
-	b.backward(4);
+	b.goto_pos(b.find("</a>"));
 	var text = b.copy();
 	total += 1;
 	epub.use_cursor(main_cur);
@@ -282,13 +294,14 @@ for (var chapter = 0; chapter < 18; ++chapter) {
 	    epub.rfind("<p>");
 	}
 	if(epub.find_fuzzy(text) >= 0) {
-	    var f_str = to_string(found+1); // because found starts at 0.
-
+	    var note_str = to_string(note_num);
+	    var note_ref_str = to_string(found)
 	    epub.use_cursor(notes_cur);
-	    if(insert_footnote(url, f_str, epub)) {
+	    if(insert_footnote(url, note_str, note_ref_str, epub)) {
 		epub.use_cursor(main_cur);
-		epub.paste("<sup><a id=\"jpref"+f_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +f_str+ "\">"+f_str+"</a></sup>");
+		epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
 		found += 1;
+		note_num += 1;
 	    } else {
 		print("annotation_failed-"+chapters[chapter] + ": " + text)
 	    }
