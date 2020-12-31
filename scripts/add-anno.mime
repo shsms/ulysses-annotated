@@ -9,11 +9,9 @@ def parseargs() {
     return parser.parse();
 }
 
-var args = parseargs();
-
 global basepath = "annotations-raw";
 
-var chapters = [
+global chapters = [
     "/index.php-telem.htm",
     "/index.php-nestor.htm",
     "/index.php-proteus.htm",
@@ -33,6 +31,8 @@ var chapters = [
     "/index.php-ithaca.htm",
     "/index.php-penelope.htm"
 ]
+
+global pagebreak = "<p class=\"pagebreak\"></p>";
 
 // first stage clean up
 def fix_basics(b) {
@@ -68,8 +68,7 @@ def fix_basics(b) {
 
 def fix_telem(b) {
      b.replace("bowl of bitter waters.", "bowl of bitter waters.</a>", 1);
-     b.replace("et unam sanctam catholicam</i></a><a id=\"010115creed1\" class=\"box-images\" href=\"notes/010115creed.htm\"><i> et apostolicam
-ecclesiam</i></a>:",
+     b.replace("et unam sanctam catholicam</i></a><a id=\"010115creed1\" class=\"box-images\" href=\"notes/010115creed.htm\"><i> et apostolicam\necclesiam</i></a>:",
   	      "et unam sanctam catholicam et apostolicam ecclesiam:</i></a>", 1);
 }
 
@@ -194,126 +193,155 @@ def insert_footnote(filename, note_id, note_ref_id, epub) {
     return true;
 }
 
-var epub = buffer("../4300-h/4300-h-updated.htm", must_open);
-var main_cur = epub.new_cursor();
-var notes_cur = epub.new_cursor();
-
-
-epub.use_cursor(main_cur);
-// add epub namespace so epub tags are recognized.
-epub.find("1999/xhtml\"");
-epub.paste(" xmlns:epub=\"http://www.idpf.org/2007/ops\"");
-
-// insert pagebreak css
-epub.find("p {");
-epub.next_line();
-epub.paste("p.pagebreak { page-break-after:always; }\n");
-global pagebreak = "<p class=\"pagebreak\"></p>";
-
-epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
-epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
-
-epub.goto_pos(epub.find("<pre xml:space=\"preserve\">"));
-epub.set_mark();
-epub.find("</pre>");
-epub.erase_region();
-
-var firstpage = buffer("firstpage.htm");
-firstpage.replace("%lastupdated%", args.date);
-epub.paste(firstpage.get_contents());
-epub.paste(pagebreak);
-
-var author_start = epub.find_fuzzy("<h2> by James Joyce </h2>");
-epub.set_mark();
-epub.goto_pos(author_start);
-epub.erase_region();
-epub.paste("<h3>by James Joyce</h3>");
-
-epub.find("<div class=\"toc\">");
-epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />")
-
-epub.find("<a name=\"link2H_4_0001\" id=\"link2H_4_0001\">");
-epub.rfind("<p>");
-epub.paste(buffer("preface.htm").get_contents());
-epub.paste(pagebreak);
-
-// move notes_cur to end of novel text. notes will be inserted there.
-epub.use_cursor(notes_cur);
-epub.find("End of the Project Gutenberg EBook of Ulysses, by James Joyce");
-epub.rfind("<pre");
-epub.set_mark();
-epub.find("</pre>");
-epub.erase_region();
-var end_pos = epub.get_pos();
-// add a page break followed by the Annotations heading.
-epub.paste(pagebreak + "\n\n<h2>Annotations</h2>");
-
-epub.use_cursor(main_cur);
-
-// go just after toc.
-epub.find("<a name=\"link2HCH0001\" id=\"link2HCH0001\">");
-epub.set_mark();
-epub.goto_pos(end_pos);
-epub.narrow_to_region(); // so that we don't match with text that we added as footnotes.
-epub.start_of_buffer();  // goes to start of narrowed region.
-
-// main logic
-var total = 0;
-var found = 0;
-var not_found = 0;
-for (var chapter = 0; chapter < 18; ++chapter) {
-    var b = buffer(basepath+chapters[chapter]);
-
-    epub.use_cursor(notes_cur);
-    epub.paste(pagebreak + "<h3>[ " + to_string(chapter+1) + " ]</h3>");
-
-    var note_num = 1;
-
-    fix_mismatches(b, chapter);
-
-    b.find("class=\"newchapter\"");
-    b.find(">");
-    b.set_mark();
-    b.find("<div id=\"footer\">");
-    b.narrow_to_region();  // the chapter pages have <a> tags after the contents, keep them out.
-    b.start_of_buffer();
-    while(b.find("href=\"") >= 0) {
-	b.set_mark();
-	b.goto_pos(b.find("\""));
-	var url = b.copy();
-
-	b.find(">");
-	b.set_mark();
-	b.goto_pos(b.find("</a>"));
-	var text = b.copy();
-	total += 1;
-	epub.use_cursor(main_cur);
-	// this phrase in chapter "penelope" comes at a different
-	// place in the epub than in the joyceproject version.
-	if (text == "the mens greenhouse") {
-	    epub.rfind("<p>");
-	}
-	if(epub.find_fuzzy(text) >= 0) {
-	    var note_str = to_string(note_num);
-	    var note_ref_str = to_string(found)
-	    epub.use_cursor(notes_cur);
-	    if(insert_footnote(url, note_str, note_ref_str, epub)) {
-		epub.use_cursor(main_cur);
-		epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
-		found += 1;
-		note_num += 1;
-	    } else {
-		print("annotation_failed-"+chapters[chapter] + ": " + text)
-	    }
-	    // print("text found: (" + chapters[chapter] + ") " + text);
-	} else {
-	    print("text_not_found-" + chapters[chapter] + ": " + text);
-	    not_found += 1;
-	}
-    }
+def add_epub_namespace(epub) {
+    epub.find("1999/xhtml\"");
+    epub.paste(" xmlns:epub=\"http://www.idpf.org/2007/ops\"");
 }
 
-print("total:" + to_string(total))
-print("found:" + to_string(found))
-print("not_found:" + to_string(not_found))
-epub.save_as("../4300-h/4300-h-annotated.htm")
+def update_css(epub) {
+    epub.find("p {");
+    epub.next_line();
+    epub.paste("p.pagebreak { page-break-after:always; }\n");
+
+    epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
+    epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
+}
+
+def replace_first_page(epub, date) {
+    epub.goto_pos(epub.find("<pre xml:space=\"preserve\">"));
+    epub.set_mark();
+    epub.find("</pre>");
+    epub.erase_region();
+
+    var firstpage = buffer("firstpage.htm");
+    firstpage.replace("%lastupdated%", date);
+    epub.paste(firstpage.get_contents());
+    epub.paste(pagebreak);
+}
+
+def update_author_formatting(epub) {
+    var author_start = epub.find_fuzzy("<h2> by James Joyce </h2>");
+    epub.set_mark();
+    epub.goto_pos(author_start);
+    epub.erase_region();
+    epub.paste("<h3>by James Joyce</h3>");
+}
+
+def insert_preface(epub) {
+    epub.find("<div class=\"toc\">");
+    epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />")
+
+    epub.find("<a name=\"link2H_4_0001\" id=\"link2H_4_0001\">");
+    epub.rfind("<p>");
+    epub.paste(buffer("preface.htm").get_contents());
+    epub.paste(pagebreak);
+}
+
+def prepare_notes_cursor(epub, notes_cur) {
+    // move notes_cur to end of novel text. notes will be inserted there.
+    epub.use_cursor(notes_cur);
+    epub.find("End of the Project Gutenberg EBook of Ulysses, by James Joyce");
+    epub.rfind("<pre");
+    epub.set_mark();
+    epub.find("</pre>");
+    epub.erase_region();
+    var end_pos = epub.get_pos();
+    epub.paste(pagebreak + "\n\n<h2>Annotations</h2>");
+    return end_pos;
+}
+
+def prepare_main_cursor(epub, main_cur, end_pos) {
+    epub.use_cursor(main_cur);
+
+    // go just before start of first chapter.
+    epub.find("<a name=\"link2HCH0001\" id=\"link2HCH0001\">");
+    epub.set_mark();
+    epub.goto_pos(end_pos);
+    epub.narrow_to_region(); // so that we don't match with text that we added as footnotes.
+    epub.start_of_buffer();  // goes to start of narrowed region.
+}
+
+
+def add_notes(epub, main_cur, notes_cur) {
+    var total = 0;
+    var found = 0;
+    var not_found = 0;
+    for (var chapter = 0; chapter < 18; ++chapter) {
+	var b = buffer(basepath+chapters[chapter]);
+
+	epub.use_cursor(notes_cur);
+	epub.paste(pagebreak + "<h3>[ " + to_string(chapter+1) + " ]</h3>");
+
+	var note_num = 1;
+
+	fix_mismatches(b, chapter);
+
+	b.find("class=\"newchapter\"");
+	b.find(">");
+	b.set_mark();
+	b.find("<div id=\"footer\">");
+	b.narrow_to_region();  // the chapter pages have <a> tags after the contents, keep them out.
+	b.start_of_buffer();
+	while(b.find("href=\"") >= 0) {
+	    b.set_mark();
+	    b.goto_pos(b.find("\""));
+	    var url = b.copy();
+
+	    b.find(">");
+	    b.set_mark();
+	    b.goto_pos(b.find("</a>"));
+	    var text = b.copy();
+	    total += 1;
+	    epub.use_cursor(main_cur);
+	    // this phrase in chapter "penelope" comes at a different
+	    // place in the epub than in the joyceproject version.
+	    if (text == "the mens greenhouse") {
+		epub.rfind("<p>");
+	    }
+	    if(epub.find_fuzzy(text) >= 0) {
+		var note_str = to_string(note_num);
+		var note_ref_str = to_string(found)
+		epub.use_cursor(notes_cur);
+		if(insert_footnote(url, note_str, note_ref_str, epub)) {
+		    epub.use_cursor(main_cur);
+		    epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
+		    found += 1;
+		    note_num += 1;
+		} else {
+		    print("annotation_failed-"+chapters[chapter] + ": " + text)
+		}
+		// print("text found: (" + chapters[chapter] + ") " + text);
+	    } else {
+		print("text_not_found-" + chapters[chapter] + ": " + text);
+		not_found += 1;
+	    }
+	}
+    }
+    print("total:" + to_string(total))
+    print("found:" + to_string(found))
+    print("not_found:" + to_string(not_found))
+}
+
+def main() {
+    var epub = buffer("../4300-h/4300-h-updated.htm", must_open);
+    var main_cur = epub.new_cursor();
+    var notes_cur = epub.new_cursor();
+    var args = parseargs();
+
+
+    epub.use_cursor(main_cur);
+
+    add_epub_namespace(epub);
+    update_css(epub);
+    replace_first_page(epub, args.date);
+    update_author_formatting(epub);
+    insert_preface(epub);
+
+    var end_pos = prepare_notes_cursor(epub, notes_cur);
+    prepare_main_cursor(epub, main_cur, end_pos);
+
+    add_notes(epub, main_cur, notes_cur)
+    epub.save_as("../4300-h/4300-h-annotated.htm")
+}
+
+main()
