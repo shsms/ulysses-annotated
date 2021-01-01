@@ -1,27 +1,18 @@
-generate: download addanno epub
+.PHONY: download addanno epub
 
 download:
-	go run dl-anno.go
+	go run dl-anno.go annotations-raw/
 
 date=$(shell bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
 addanno:
-	mime upd-epub-to-jp.mime
-	mime add-anno.mime --date "$(date)"
+	mime upd-epub-to-jp.mime --infile ../4300-h/4300-h.htm --outfile /tmp/updated-to-jp.htm
+	mime add-anno.mime --date "${date}" --anno_path annotations-raw/ --infile /tmp/updated-to-jp.htm --outfile /tmp/annotated.htm
 
 epub:
 	ebookmaker \
 		--make epub.images \
 		--title Ulysses \
 		--author "James Joyce" \
-		--output-file ../4300-h/4300-h-annotated.epub \
+		--output-file ../ulysses-annotated.epub \
 		--cover ../cover.jpg \
-		../4300-h/4300-h-annotated.htm
-
-epub-orig:
-	ebookmaker \
-		--make epub.images \
-		--title Ulysses \
-		--author "James Joyce" \
-		--output-file ../4300-h/4300-h.epub \
-		--cover ../cover.jpg \
-		../4300-h/4300-h.htm
+		/tmp/annotated.htm

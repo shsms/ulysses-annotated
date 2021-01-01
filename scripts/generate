@@ -1,0 +1,16 @@
+#!/bin/bash
+
+date=$(bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
+
+cd scripts
+mime upd-epub-to-jp.mime --infile ../4300-h/4300-h.htm --outfile updated-to-jp.htm
+mime add-anno.mime --date "${date}" --anno_path /datadir/annotations-raw/ --infile updated-to-jp.htm --outfile annotated.htm
+
+ebookmaker \
+	--make epub.images \
+	--title Ulysses \
+	--author "James Joyce" \
+	--output-file /datadir/ulysses-annotated.epub \
+	--cover ../cover.jpg \
+	annotated.htm
+

@@ -1,5 +1,12 @@
 // -*- js -*-
 
+def parseargs() {
+    var parser = args_parser();
+    parser.string_opt("infile", "path of the input file");
+    parser.string_opt("outfile", "path of the output file");
+    return parser.parse();
+}
+
 def update(b, from, to) {
     var start = b.find_fuzzy(from);
     if(start == -1) {
@@ -504,7 +511,9 @@ National Press</i> <i>"),
 ]
 
 
-var epub = buffer("../4300-h/4300-h.htm", must_open);
+var args = parseargs();
+
+var epub = buffer(args.infile, must_open);
 
 var success = true;
 for(i : items) {
@@ -514,5 +523,5 @@ for(i : items) {
 }
 
 if(success) {
-    epub.save_as("../4300-h/4300-h-updated.htm");
+    epub.save_as(args.outfile);
 }

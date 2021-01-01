@@ -6,10 +6,13 @@
 def parseargs() {
     var parser = args_parser();
     parser.string_opt("d,date", "date for the last_updated field")
+    parser.string_opt("anno_path", "path of the downloaded annotations");
+    parser.string_opt("infile", "path of the input file");
+    parser.string_opt("outfile", "path of the output file");
     return parser.parse();
 }
 
-global basepath = "annotations-raw";
+global basepath;
 
 global chapters = [
     "/index.php-telem.htm",
@@ -323,10 +326,12 @@ def add_notes(epub, main_cur, notes_cur) {
 }
 
 def main() {
-    var epub = buffer("../4300-h/4300-h-updated.htm", must_open);
+    var args = parseargs();
+    basepath = args.anno_path;
+
+    var epub = buffer(args.infile, must_open);
     var main_cur = epub.new_cursor();
     var notes_cur = epub.new_cursor();
-    var args = parseargs();
 
 
     epub.use_cursor(main_cur);
@@ -341,7 +346,7 @@ def main() {
     prepare_main_cursor(epub, main_cur, end_pos);
 
     add_notes(epub, main_cur, notes_cur)
-    epub.save_as("../4300-h/4300-h-annotated.htm")
+    epub.save_as(args.outfile)
 }
 
 main()

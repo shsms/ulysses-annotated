@@ -24,14 +24,14 @@ func main() {
 	cfilter := `\/(index.php\?chapter|notes\/.*html?)`
 
 	spec := gc.NewJobSpec(
-		gc.Depth(5),
-		gc.MaxIdleTime(60),
+		gc.Depth(2),
+		gc.MaxIdleTime(5),
 		//		gc.Chrome(true, "/usr/bin/chromium"),
 		gc.CallbackURLRegexp(cfilter),
 		gc.FollowURLRegexp(ffilter),
 		gc.PageChan(gc.NewPageChan()),
 		gc.ThreadsPerSite(5),
-		gc.MinDelay(2),
+		gc.MinDelay(1),
 	)
 
 	z, err := gc.NewCrawlJob(w, spec)
@@ -56,12 +56,13 @@ func saveFile(ph *gc.PageHTML) {
 	if err != nil {
 		return
 	}
-	filepath := "annotations-raw/" + path.Dir(u.Path)
+	basedir := os.Args[1]
+	filepath := basedir + path.Dir(u.Path)
 	suffix :=  u.Query().Get("chapter")
 	if len(suffix) > 0 {
 		suffix = "-" + suffix + ".htm"
 	}
-	fn := "annotations-raw/" + u.Path + suffix
+	fn := basedir + u.Path + suffix
 	log.Println(ph.Httpstatuscode, u.Path, path.Dir(u.Path), ph.UrlDepth)
 	os.MkdirAll(filepath, 0755)
 	ioutil.WriteFile(fn, ph.Content, 0755)
