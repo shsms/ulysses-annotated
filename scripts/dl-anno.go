@@ -20,18 +20,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ffilter := `joyceproject.com($|\/(index.php\?chapter|notes\/.*html?))`
-	cfilter := `\/(index.php\?chapter|notes\/.*html?)`
+	ffilter := `joyceproject.com($|\/(index.php\?chapter|notes\/.*html?|scripts\/swap(\/.*js)?))`
+	cfilter := `\/(index.php\?chapter|notes\/.*html?|scripts\/swap\/.*js)`
 
 	spec := gc.NewJobSpec(
 		gc.Depth(2),
 		gc.MaxIdleTime(5),
-		//		gc.Chrome(true, "/usr/bin/chromium"),
 		gc.CallbackURLRegexp(cfilter),
 		gc.FollowURLRegexp(ffilter),
 		gc.PageChan(gc.NewPageChan()),
 		gc.ThreadsPerSite(5),
 		gc.MinDelay(1),
+		gc.NoMimeType(),
 	)
 
 	z, err := gc.NewCrawlJob(w, spec)
@@ -39,8 +39,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	z.AddPage("http://www.joyceproject.com/scripts/swap", "")
 	z.AddPage("http://joyceproject.com", "")
-
 	for z.IsAlive() == true {
 		select {
 		case ph := <-z.PageChan:
@@ -54,6 +54,7 @@ func main() {
 func saveFile(ph *gc.PageHTML) {
 	u, err := url.Parse(ph.Url)
 	if err != nil {
+		log.Print("Error: " + err.Error())
 		return
 	}
 	basedir := os.Args[1]
@@ -62,8 +63,8 @@ func saveFile(ph *gc.PageHTML) {
 	if len(suffix) > 0 {
 		suffix = "-" + suffix + ".htm"
 	}
-	fn := basedir + u.Path + suffix
-	log.Println(ph.Httpstatuscode, u.Path, path.Dir(u.Path), ph.UrlDepth)
+	fn := path.Join(basedir, u.Path + suffix)
+	log.Println(ph.Httpstatuscode, fn, ph.UrlDepth)
 	os.MkdirAll(filepath, 0755)
 	ioutil.WriteFile(fn, ph.Content, 0755)
 }

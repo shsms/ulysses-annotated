@@ -202,6 +202,10 @@ on saint Peter Claver"),
 	"Wallace Bros the\nbottleworks. Dodder bridge."),
 
     diff(
+	"Wonder he had the gumption to propose to any girl.",
+	"Wonder how he had the gumption to propose to any girl."),
+
+    diff(
 	"<i>Church Times.</i>",
 	"<i>Church Times</i>."),
 

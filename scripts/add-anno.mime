@@ -9,6 +9,7 @@ def parseargs() {
     parser.string_opt("anno_path", "path of the downloaded annotations");
     parser.string_opt("infile", "path of the input file");
     parser.string_opt("outfile", "path of the output file");
+    parser.string_opt("colour_outfile", "path of the colour coded output file");
     return parser.parse();
 }
 
@@ -35,7 +36,54 @@ global chapters = [
     "/index.php-penelope.htm"
 ]
 
+global colour_files = [
+    "/scripts/swap/aeolus.js",
+    "/scripts/swap/calypso.js",
+    "/scripts/swap/circe.js",
+    "/scripts/swap/cyclops.js",
+    "/scripts/swap/eumaeus.js",
+    "/scripts/swap/hades.js",
+    "/scripts/swap/ithaca.js",
+    "/scripts/swap/lestry.js",
+    "/scripts/swap/lotus.js",
+    "/scripts/swap/nausicaa.js",
+    "/scripts/swap/nestor.js",
+    "/scripts/swap/oxen.js",
+    "/scripts/swap/penelope.js",
+    "/scripts/swap/proteus.js",
+    "/scripts/swap/scylla.js",
+    "/scripts/swap/sirens.js",
+    "/scripts/swap/telem.js",
+    "/scripts/swap/wrocks.js"
+]
+
 global pagebreak = "<p class=\"pagebreak\"></p>";
+
+def parse_colours() {
+    var colours = Map();
+    var exp_items = 0;
+    for (var chapter = 0; chapter < 18; ++chapter) {
+	var b = buffer(basepath+colour_files[chapter]);
+	b.find("Remove Highlighting");
+	b.narrow_to_block();
+	while(b.find("getElementById('") >= 0) {
+	    b.set_mark();
+	    b.goto_pos(b.find("')"));
+	    var note_name = to_string(b.copy());
+
+	    b.goto_pos(b.find("#"));
+	    b.set_mark();
+	    b.goto_pos(b.find("'"));
+	    var colour = to_string(b.copy());
+	    
+	    colours[note_name] = colour;
+//	    print("'" + note_name + "' -> '" + colour + "'");
+	    exp_items += 1;
+	}
+    }
+//    print("exp_items: " + to_string(exp_items) + "; items: " + to_string(colours.size()));
+    return colours;
+}
 
 // first stage clean up
 def fix_basics(b) {
@@ -207,6 +255,7 @@ def update_css(epub) {
     epub.paste("p.pagebreak { page-break-after:always; }\n");
 
     epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
+    epub.paste("p.preface { margin-bottom: 1.3em; }");
     epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
 }
 
@@ -223,6 +272,7 @@ def replace_first_page(epub, date) {
 }
 
 def update_author_formatting(epub) {
+    epub.replace("<p class=\"title3\">Ulysses</p>", "<p class=\"title3\"><em>Ulysses</em></p>")
     var author_start = epub.find_fuzzy("<h2> by James Joyce </h2>");
     epub.set_mark();
     epub.goto_pos(author_start);
@@ -265,10 +315,17 @@ def prepare_main_cursor(epub, main_cur, end_pos) {
 }
 
 
-def add_notes(epub, main_cur, notes_cur) {
+def add_notes(epub, main_cur, notes_cur, use_colour) {
     var total = 0;
     var found = 0;
     var not_found = 0;
+
+    var colours;
+
+    if (use_colour) {
+	colours = parse_colours();
+    }
+
     for (var chapter = 0; chapter < 18; ++chapter) {
 	var b = buffer(basepath+chapters[chapter]);
 
@@ -294,6 +351,14 @@ def add_notes(epub, main_cur, notes_cur) {
 	    b.set_mark();
 	    b.goto_pos(b.find("</a>"));
 	    var text = b.copy();
+	    var eol = b.get_pos();
+	    
+	    b.goto_pos(b.rfind("id=\""));
+	    b.set_mark();
+	    b.goto_pos(b.find("\""));
+	    var note_name = to_string(b.copy());
+	    
+	    b.goto_pos(eol);
 	    total += 1;
 	    epub.use_cursor(main_cur);
 	    // this phrase in chapter "penelope" comes at a different
@@ -307,7 +372,11 @@ def add_notes(epub, main_cur, notes_cur) {
 		epub.use_cursor(notes_cur);
 		if(insert_footnote(url, note_str, note_ref_str, epub)) {
 		    epub.use_cursor(main_cur);
-		    epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
+		    if(use_colour && colours.count(note_name) > 0) {
+			epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" style=\"color:"+colours[note_name]+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
+		    } else {
+			epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
+		    }
 		    found += 1;
 		    note_num += 1;
 		} else {
@@ -325,8 +394,7 @@ def add_notes(epub, main_cur, notes_cur) {
     print("not_found:" + to_string(not_found))
 }
 
-def main() {
-    var args = parseargs();
+def make_epub(use_colours, args, outfile) {
     basepath = args.anno_path;
 
     var epub = buffer(args.infile, must_open);
@@ -345,8 +413,14 @@ def main() {
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
 
-    add_notes(epub, main_cur, notes_cur)
-    epub.save_as(args.outfile)
+    add_notes(epub, main_cur, notes_cur, use_colours);
+    epub.save_as(outfile)
+}
+
+def main() {
+    var args = parseargs();
+    make_epub(false, args, args.outfile)
+    make_epub(true, args, args.colour_outfile)
 }
 
 main()
