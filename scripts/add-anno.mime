@@ -85,6 +85,50 @@ def parse_colours() {
     return colours;
 }
 
+def join_repeated_links(b) {
+    b.start_of_buffer();
+
+    var rep_pos = b.find_fuzzy("</a> <a");
+    while(rep_pos >= 0) {
+	b.goto_pos(b.rfind("href=\""));
+	b.set_mark();
+	b.goto_pos(b.find("\""));
+	var url_left = b.copy();
+
+	b.goto_pos(rep_pos);
+
+	b.find("href=\"");
+	b.set_mark();
+	b.goto_pos(b.find("\""));
+	var url_right = b.copy();
+
+	if (url_left == url_right) {
+	    b.goto_pos(rep_pos);
+	    b.set_mark();
+	    b.find("<a");
+	    b.find(">");
+	    b.erase_region();
+	    b.paste(" ");
+	}
+
+	rep_pos = b.find_fuzzy("</a> <a");
+    }
+}
+
+def join_repeated_italics(b) {
+    b.start_of_buffer();
+
+    var rep_pos = b.find_fuzzy("</i> <i>");
+    while(rep_pos >= 0) {
+	b.set_mark();
+	b.goto_pos(rep_pos);
+	b.erase_region();
+	b.paste(" ");
+
+	rep_pos = b.find_fuzzy("</i> <i>");
+    }
+}
+
 // first stage clean up
 def fix_basics(b) {
     b.find("<p class=\"newchapter\">");
@@ -124,7 +168,8 @@ def fix_telem(b) {
 }
 
 def fix_proteus(b) {
-     b.replace("nous, Irlande,</i></a>", "nous, Irlande,</a></i>", 1);
+    b.replace("href=\"notes/030022chaussons.htm\">vous savez ah, oui!</i></a>",
+	      "href=\"notes/030022chaussons.htm\"><i>vous savez ah, oui!</i></a>", 1);
 }
 
 def fix_nausicaa(b) {
@@ -161,6 +206,8 @@ def fix_mismatches(b, chapter) {
     case (15) {fix_eumaeus(b);  break;}
     case (17) {fix_penelope(b); break;}
     }
+    join_repeated_links(b);
+    join_repeated_italics(b);
     b.start_of_buffer();
 }
 

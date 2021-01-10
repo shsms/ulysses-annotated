@@ -137,10 +137,6 @@ a widowed see, with upstiffed omophorion"),
 	"setier!"),
 
     diff(
-	"Kilkenny are stout",
-	"Kilkenny are</i> <i>stout"),
-
-    diff(
 	" ensablé</i> Louis",
 	" ensablé</i>, Louis"),
 
