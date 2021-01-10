@@ -103,6 +103,7 @@ def join_repeated_links(b) {
 	var url_right = b.copy();
 
 	if (url_left == url_right) {
+	    // print("repeated link: " + b.get_name() + ": " + url_left)
 	    b.goto_pos(rep_pos);
 	    b.set_mark();
 	    b.find("<a");
@@ -300,7 +301,6 @@ def update_css(epub) {
     epub.find("p {");
     epub.next_line();
     epub.paste("p.pagebreak { page-break-after:always; }\n");
-
     epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
     epub.paste("p.preface { margin-bottom: 1.3em; }");
     epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
@@ -361,6 +361,19 @@ def prepare_main_cursor(epub, main_cur, end_pos) {
     epub.start_of_buffer();  // goes to start of narrowed region.
 }
 
+def penelope_reorder(epub) {
+    epub.find("they hide it with a cabbageleaf");
+    epub.set_mark();
+    epub.find("kick or a bang of something there");
+    var passage_to_move = epub.cut();
+    print(passage_to_move);
+    epub.set_mark();
+    epub.find("go about like that I asked him");
+    print("\n\n" + epub.copy())
+    epub.paste(passage_to_move);
+    epub.start_of_buffer();
+}
+
 
 def add_notes(epub, main_cur, notes_cur, use_colour) {
     var total = 0;
@@ -408,11 +421,7 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
 	    b.goto_pos(eol);
 	    total += 1;
 	    epub.use_cursor(main_cur);
-	    // this phrase in chapter "penelope" comes at a different
-	    // place in the epub than in the joyceproject version.
-	    if (text == "the mens greenhouse") {
-		epub.rfind("<p>");
-	    }
+
 	    if(epub.find_fuzzy(text) >= 0) {
 		var note_str = to_string(note_num);
 		var note_ref_str = to_string(found)
@@ -459,6 +468,7 @@ def make_epub(use_colours, args, outfile) {
 
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
+    penelope_reorder(epub);
 
     add_notes(epub, main_cur, notes_cur, use_colours);
     epub.save_as(outfile)
