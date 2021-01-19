@@ -41,7 +41,7 @@ func main() {
 
 	z.AddPage("http://www.joyceproject.com/scripts/swap", "")
 	z.AddPage("http://joyceproject.com", "")
-	for z.IsAlive() == true {
+	for z.IsAlive() {
 		select {
 		case ph := <-z.PageChan:
 			go saveFile(ph)

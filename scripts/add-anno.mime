@@ -85,10 +85,10 @@ def parse_colours() {
     return colours;
 }
 
-def join_repeated_links(b) {
+def join_repeated_links(b, pattern, to_paste) {
     b.start_of_buffer();
 
-    var rep_pos = b.find_fuzzy("</a> <a");
+    var rep_pos = b.find_fuzzy(pattern);
     while(rep_pos >= 0) {
 	b.goto_pos(b.rfind("href=\""));
 	b.set_mark();
@@ -109,10 +109,10 @@ def join_repeated_links(b) {
 	    b.find("<a");
 	    b.find(">");
 	    b.erase_region();
-	    b.paste(" ");
+	    b.paste(to_paste);
 	}
 
-	rep_pos = b.find_fuzzy("</a> <a");
+	rep_pos = b.find_fuzzy(pattern);
     }
 }
 
@@ -207,36 +207,15 @@ def fix_mismatches(b, chapter) {
     case (15) {fix_eumaeus(b);  break;}
     case (17) {fix_penelope(b); break;}
     }
-    join_repeated_links(b);
+    join_repeated_links(b, "</a> <a", " ");
+    join_repeated_links(b, "</a><a", " ");
+    // join_repeated_links(b, "</a> </p> <p> <a", " </p> <p> ");
     join_repeated_italics(b);
     b.start_of_buffer();
 }
 
-def insert_footnote(filename, note_id, note_ref_id, epub) {
-    var note_b = buffer(basepath + "/" + filename);
-    if(note_b.empty()) {
-	return false;
-    }
-    var title = "(title unknown)";
-    if(note_b.find("<title>") >= 0) {
-	note_b.set_mark();
-	if (!note_b.goto_pos(note_b.find("</title>"))) {
-	    print("error: title end tag not found: " + filename);
-	    return false;
-	}
-	title = to_string(note_b.copy());
-    } else {
-	print("warning: unable to find title for note: " + filename);
-    }
-    if(note_b.find("<div id=\"note\">") < 0) {
-	print("error: couldn't find starting point of note: " + filename);
-	return false;
-    }
-
-    note_b.set_mark();
-    note_b.goto_pos(note_b.find("</div>"));
-    note_b.narrow_to_region();
-
+def cleanup_note(note_b) {
+    note_b.start_of_buffer();
     while(note_b.find("<a") >= 0) {
 	note_b.backward(2);
 	note_b.set_mark();
@@ -259,12 +238,20 @@ def insert_footnote(filename, note_id, note_ref_id, epub) {
     note_b.replace("—", "&mdash;")
 
     // somefiles seem to have extra nested divs
+    note_b.start_of_buffer();
     note_b.replace("<div id=\"note2\">", "");
     note_b.replace("<div id=\"note\">", "");
+    note_b.replace("<div>", "");
+    note_b.replace("</div>", "");
 
     note_b.start_of_buffer();
     if (note_b.find(regex("<p[ >]")) < 0) {
 	note_b.paste("<p>");
+	note_b.end_of_buffer();
+	note_b.paste("</p>");
+    }
+    note_b.start_of_buffer();
+    if (note_b.find("</p>") < 0) {
 	note_b.end_of_buffer();
 	note_b.paste("</p>");
     }
@@ -278,17 +265,97 @@ def insert_footnote(filename, note_id, note_ref_id, epub) {
     }
     note_b.start_of_buffer();
     note_b.replace("</meta>", "");
+}
+
+def add_to_notes_map(notes_index, title, url) {
+    var letter = to_string(title[0]);
+
+    var t = to_string(title);
+
+    if (notes_index.count(letter) == 0) {
+	notes_index[letter] = Map();
+    }
+    notes_index[letter][t] = url;
+}
+
+def insert_footnote(filename, note_id, note_ref_id, epub, notes_index) {
+    var note_b = buffer(basepath + "/" + filename);
+    if(note_b.empty()) {
+	return false;
+    }
+    var title = "(title unknown)";
+    if(note_b.find("<title>") >= 0) {
+	note_b.set_mark();
+	if (!note_b.goto_pos(note_b.find("</title>"))) {
+	    print("error: title end tag not found: " + filename);
+	    return false;
+	}
+	title = to_string(note_b.copy());
+	add_to_notes_map(notes_index, note_b.copy(), "http://joyceproject.com/" + filename);
+    } else {
+	print("warning: unable to find title for note: " + filename);
+    }
+    if(note_b.find("<div id=\"note\">") < 0) {
+	print("error: couldn't find starting point of note: " + filename);
+	return false;
+    }
+    note_b.set_mark();
+    note_b.goto_pos(note_b.find("</div>"));
+    note_b.narrow_to_region();
+
+    cleanup_note(note_b);
 
     note_b.start_of_buffer();
     note_b.paste("<font size=\"+1\"><em>" + note_id + ". " + title + "</em></font>\n");
+    note_b.end_of_buffer();
+    note_b.rfind("</p>");
+    note_b.paste(" <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">⤶</a>")
+    var note = note_b.get_contents();
+    var extended_note_found = true;
+    note_b.end_of_buffer();
+    note_b.widen();
+    if(note_b.find(regex("<div id=\"expandednote\".*>")) < 0) {
+	print("error: couldn't find extended note: " + filename);
+	extended_note_found = false;
+    }
+    note_b.set_mark();
+    note_b.find("<div id=\"button\"");
+    if (extended_note_found && note_b.copy().empty()) {
+	print("error: couldn't fine end of extended note: " + filename);
+	extended_note_found = false;
+    }
+
+    if (!extended_note_found) {
+	epub.paste("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">"+
+		   note +
+		   "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n");
+	return true;
+    }
+    note_b.rfind("</div>");
+    note_b.narrow_to_region();
+
+    cleanup_note(note_b);
 
     note_b.start_of_buffer();
-    note_b.set_mark();
-    note_b.end_of_buffer();
-    var note = note_b.copy();
-    epub.paste(("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">") +
-	       note +
-	       ("<br/>Read more on <a href=\"http://joyceproject.com/"+filename+"\">joyceproject.com</a><br/>Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n"));
+
+    // remove signature block if present
+    if(note_b.goto_pos(note_b.find("<div id=\"return\">"))) {
+	note_b.set_mark();
+	note_b.find("</div>");
+	note_b.erase_region();
+    } else if(note_b.goto_pos(note_b.find(regex("<p>JH 20[0-9][0-9]</p>")))) {
+	note_b.set_mark();
+	note_b.find("</p>");
+	note_b.erase_region();
+    }
+
+    var extended_note = note_b.get_contents();
+
+    epub.paste("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">"+
+	       note + "<br/><u><em>Read more</em></u>" +
+	       extended_note +
+	       "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n");
+
     return true;
 }
 
@@ -319,18 +386,31 @@ def replace_first_page(epub, date) {
 }
 
 def update_author_formatting(epub) {
-    epub.replace("<p class=\"title3\">Ulysses</p>", "<p class=\"title3\"><em>Ulysses</em></p>")
+    epub.replace("<p class=\"title3\">Ulysses</p>", "<p class=\"title3\"><em>Ulysses</em></p>");
     var author_start = epub.find_fuzzy("<h2> by James Joyce </h2>");
     epub.set_mark();
     epub.goto_pos(author_start);
     epub.erase_region();
     epub.paste("<h3>by James Joyce</h3>");
+    epub.find("<hr />");
+    epub.paste(pagebreak);
+}
+
+def update_toc(epub) {
+    epub.find("<div class=\"toc\">");
+    epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />");
+
+    epub.find("[ 18 ]");
+    epub.find("</div>");
+    epub.paste("<br /> <div style=\"text-align: center;\">");
+    epub.paste("<a href=\"#link2H_4_annotations\"> Annotations </a><br />");
+    epub.paste("<a href=\"#link2H_4_index_titles\"> Index of Titles </a><br /></div>");
+
+    epub.find("<hr />");
+    epub.paste(pagebreak);
 }
 
 def insert_preface(epub) {
-    epub.find("<div class=\"toc\">");
-    epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />")
-
     epub.find("<a name=\"link2H_4_0001\" id=\"link2H_4_0001\">");
     epub.rfind("<p>");
     epub.paste(buffer("preface.htm").get_contents());
@@ -347,6 +427,7 @@ def prepare_notes_cursor(epub, notes_cur) {
     epub.erase_region();
     var end_pos = epub.get_pos();
     epub.paste(pagebreak + "\n\n<h2>Annotations</h2>");
+    epub.paste("<a name=\"link2H_4_annotations\" id=\"link2H_4_annotations\"> </a>\n")
     return end_pos;
 }
 
@@ -366,10 +447,10 @@ def penelope_reorder(epub) {
     epub.set_mark();
     epub.find("kick or a bang of something there");
     var passage_to_move = epub.cut();
-    print(passage_to_move);
+    // print(passage_to_move);
     epub.set_mark();
     epub.find("go about like that I asked him");
-    print("\n\n" + epub.copy())
+    // print("\n\n" + epub.copy())
     epub.paste(passage_to_move);
     epub.start_of_buffer();
 }
@@ -385,6 +466,8 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
     if (use_colour) {
 	colours = parse_colours();
     }
+
+    var notes_index = Map();
 
     for (var chapter = 0; chapter < 18; ++chapter) {
 	var b = buffer(basepath+chapters[chapter]);
@@ -426,7 +509,7 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
 		var note_str = to_string(note_num);
 		var note_ref_str = to_string(found)
 		epub.use_cursor(notes_cur);
-		if(insert_footnote(url, note_str, note_ref_str, epub)) {
+		if(insert_footnote(url, note_str, note_ref_str, epub, notes_index)) {
 		    epub.use_cursor(main_cur);
 		    if(use_colour && colours.count(note_name) > 0) {
 			epub.paste("<sup><a id=\"jpref"+note_ref_str+"\" style=\"color:"+colours[note_name]+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note_str+"</a></sup>");
@@ -448,6 +531,38 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
     print("total:" + to_string(total))
     print("found:" + to_string(found))
     print("not_found:" + to_string(not_found))
+
+    return notes_index;
+}
+
+def add_notes_index(epub, notes_index) {
+    epub.paste(pagebreak);
+    epub.paste("<h2>Index of Titles</h2>");
+    epub.paste("<a name=\"link2H_4_index_titles\" id=\"link2H_4_index_titles\"> </a>\n")
+    epub.paste("All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note on <a href=\"http://joyceproject.com\">joyceproject.com</a> without locating its appearances in the text of the novel.")
+    var count = 0;
+    for (letter : notes_index) {
+	if (letter.first == "Ü") {
+	    continue
+	}
+	// print(letter.first)
+	epub.paste("<h3>" + letter.first + "</h3>");
+
+	if (letter.first == "U") {
+	    for (note : notes_index["Ü"]) {
+		// print (note.first);
+		++count;
+		epub.paste("<a href=\"" + note.second + "\">" + note.first + "</a><br/>");
+	    }
+	}
+
+	for (note : letter.second) {
+	    // print(note.first);
+	    ++count;
+	    epub.paste("<a href=\"" + note.second + "\">" + note.first + "</a><br/>");
+	}
+    }
+    print("total_distinct: " + to_string(count))
 }
 
 def make_epub(use_colours, args, outfile) {
@@ -464,13 +579,17 @@ def make_epub(use_colours, args, outfile) {
     update_css(epub);
     replace_first_page(epub, args.date);
     update_author_formatting(epub);
+    update_toc(epub);
     insert_preface(epub);
 
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
     penelope_reorder(epub);
 
-    add_notes(epub, main_cur, notes_cur, use_colours);
+    var notes_index = add_notes(epub, main_cur, notes_cur, use_colours);
+    epub.use_cursor(notes_cur)
+    add_notes_index(epub, notes_index);
+
     epub.save_as(outfile)
 }
 
