@@ -291,7 +291,7 @@ def insert_footnote(filename, note_id, note_ref_id, epub, notes_index) {
 	    return false;
 	}
 	title = to_string(note_b.copy());
-	add_to_notes_map(notes_index, note_b.copy(), "http://joyceproject.com/" + filename);
+	add_to_notes_map(notes_index, note_b.copy(), filename);
     } else {
 	print("warning: unable to find title for note: " + filename);
     }
@@ -306,7 +306,11 @@ def insert_footnote(filename, note_id, note_ref_id, epub, notes_index) {
     cleanup_note(note_b);
 
     note_b.start_of_buffer();
-    note_b.paste("<font size=\"+1\"><em>" + note_id + ". " + title + "</em></font>\n");
+    var title_with_id = title;
+    if (!note_id.empty()) {
+	title_with_id = note_id + ". " + title;
+    }
+    note_b.paste("<font size=\"+1\"><em>" + title_with_id + "</em></font>\n");
     note_b.end_of_buffer();
     note_b.rfind("</p>");
     note_b.paste(" <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">⤶</a>")
@@ -535,11 +539,18 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
     return notes_index;
 }
 
-def add_notes_index(epub, notes_index) {
+def add_notes_index(epub, notes_index, index_cur, notes_cur) {
+    epub.use_cursor(index_cur);
     epub.paste(pagebreak);
     epub.paste("<h2>Index of Titles</h2>");
     epub.paste("<a name=\"link2H_4_index_titles\" id=\"link2H_4_index_titles\"> </a>\n")
-    epub.paste("All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note on <a href=\"http://joyceproject.com\">joyceproject.com</a> without locating its appearances in the text of the novel.")
+    epub.paste("<p>All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note without locating its appearances in the text of the novel.</p>")
+
+    epub.use_cursor(notes_cur);
+    epub.paste(pagebreak);
+    epub.paste("<h3>Titles</h3>");
+
+    epub.use_cursor(index_cur);
     var count = 0;
     for (letter : notes_index) {
 	if (letter.first == "Ü") {
@@ -548,21 +559,29 @@ def add_notes_index(epub, notes_index) {
 	// print(letter.first)
 	epub.paste("<h3>" + letter.first + "</h3>");
 
+	var notes = Vector();
 	if (letter.first == "U") {
 	    for (note : notes_index["Ü"]) {
-		// print (note.first);
-		++count;
-		epub.paste("<a href=\"" + note.second + "\">" + note.first + "</a><br/>");
+		notes.push_back(note);
 	    }
 	}
 
 	for (note : letter.second) {
+	    notes.push_back(note);
+	}
+	for (note : notes) {
+	    var note_ref_str = "iot-" + to_string(count);
 	    // print(note.first);
-	    ++count;
-	    epub.paste("<a href=\"" + note.second + "\">" + note.first + "</a><br/>");
+	    epub.use_cursor(notes_cur);
+	    
+	    if(insert_footnote(note.second, "", note_ref_str, epub, Map())) {
+		epub.use_cursor(index_cur);
+		epub.paste("<a id=\"jpref"+note_ref_str+"\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" +note_ref_str+ "\">"+note.first+"</a><br />");
+		++count;
+	    }
 	}
     }
-    print("total_distinct: " + to_string(count))
+    print("distinct_notes: " + to_string(count))
 }
 
 def make_epub(use_colours, args, outfile) {
@@ -571,7 +590,7 @@ def make_epub(use_colours, args, outfile) {
     var epub = buffer(args.infile, must_open);
     var main_cur = epub.new_cursor();
     var notes_cur = epub.new_cursor();
-
+    var index_cur = epub.new_cursor();
 
     epub.use_cursor(main_cur);
 
@@ -587,8 +606,14 @@ def make_epub(use_colours, args, outfile) {
     penelope_reorder(epub);
 
     var notes_index = add_notes(epub, main_cur, notes_cur, use_colours);
-    epub.use_cursor(notes_cur)
-    add_notes_index(epub, notes_index);
+
+    epub.use_cursor(notes_cur);
+    var notes_cur_pos = epub.get_pos();
+    
+    epub.use_cursor(index_cur);
+    epub.goto_pos(notes_cur_pos);
+    
+    add_notes_index(epub, notes_index, index_cur, notes_cur);
 
     epub.save_as(outfile)
 }
