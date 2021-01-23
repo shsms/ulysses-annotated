@@ -44,10 +44,13 @@ jobs:
       - name: add annotations
         run: |
           MIME=../mime make -C scripts addanno
+
       - name: generate epub
         run: |
           export PATH=$PATH:${PWD}
           make -C scripts epub
+          cp ulysses-annotated.epub reader/
+
       - name: env vars
         run: |
           if [[ "${{ github.event.inputs.tag }}" != "" ]]; then
@@ -61,7 +64,6 @@ jobs:
               echo "DRAFT_STR=false" >> $GITHUB_ENV
           fi
 
-          
       - name: Create Release
         id: createrelease
         uses: actions/create-release@latest
@@ -72,6 +74,7 @@ jobs:
           release_name: ${{ env.TAG_STR }}
           draft: ${{ env.DRAFT_STR }}
           prerelease: false
+
       - name: Upload the artifacts
         uses: skx/github-action-publish-binaries@master
         env:
@@ -79,3 +82,11 @@ jobs:
         with:
           releaseId: ${{ steps.createrelease.outputs.id }}
           args: 'ulysses-annotated*.epub'
+
+      - name: Deploy web reader
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: reader
+          CLEAN: true
