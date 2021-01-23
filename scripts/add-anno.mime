@@ -268,7 +268,7 @@ def cleanup_note(note_b) {
 }
 
 def add_to_notes_map(notes_index, title, url) {
-    var letter = to_string(title[0]);
+    var letter = to_string(title.at(0));
 
     var t = to_string(title);
 
@@ -374,6 +374,7 @@ def update_css(epub) {
     epub.paste("p.pagebreak { page-break-after:always; }\n");
     epub.paste("p.firstpage {text-align: justify; margin-top: 1em; margin-bottom: 1em; text-indent: 0;}\n");
     epub.paste("p.preface { margin-bottom: 1.3em; }");
+    epub.paste("p.preface-li { text-indent: 0; margin-bottom: 1.3em; }");
     epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
 }
 
