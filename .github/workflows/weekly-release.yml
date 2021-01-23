@@ -1,7 +1,16 @@
-on: workflow_dispatch
-# on:
-#   schedule:
-#     - cron:  '* 6 * * 0'
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag for new release'
+        required: true
+        default: 'v2020.01.01-alpha'
+      draft:
+        description: 'Draft release? (true/false)'
+        required: true
+        default: 'true'
+  schedule:
+    - cron:  '* 1 * * 0'
 name: Weekly rebuild
 jobs:
   generate:
@@ -10,42 +19,63 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@master
+      - name: install-deps
+        run: |
+          sudo apt-get update
+          sudo apt-get remove python
+          sudo apt-get install python3 tidy calibre python3-pip
+          sudo -H pip3 install setuptools
+          sudo -H pip3 install ebookmaker pytidylib
       - name: get ideacrawler
-        run: go get github.com/shsms/ideacrawler
+        run: |
+          go get github.com/shsms/ideacrawler
       - name: get mime
         run: |
           curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
           tar -xvf mime-linux-amd64.tar.gz
-          install mime /usr/bin/
+          chmod +x mime
       - name: download annotations
         run: |
-          ideacrawler &>/dev/null &
+          ~/go/bin/ideacrawler &>/dev/null &
           sleep 1
           make -C scripts download
           killall ideacrawler
+        timeout-minutes: 10
       - name: add annotations
         run: |
-          make -C scripts addanno
+          MIME=../mime make -C scripts addanno
       - name: generate epub
         run: |
+          export PATH=$PATH:${PWD}
           make -C scripts epub
       - name: env vars
-        run: echo "MY_DATE=$(date +%Y.%m.%d)" >> $GITHUB_ENV
+        run: |
+          if [[ "${{ github.event.inputs.tag }}" != "" ]]; then
+              echo "TAG_STR=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          else
+              echo "TAG_STR=v$(date +%Y.%m.%d)" >> $GITHUB_ENV
+          fi
+          if [[ "${{ github.event.inputs.draft }}" != "" ]]; then
+              echo "DRAFT_STR=${{ github.event.inputs.draft }}" >> $GITHUB_ENV
+          else
+              echo "DRAFT_STR=v$(date +%Y.%m.%d)" >> $GITHUB_ENV
+          fi
+
+          
       - name: Create Release
-        id: weekly-rebuild
+        id: createrelease
         uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.MY_DATE }}
-          release_name: ${{ env.MY_DATE }}
-          draft: true
-          prerelease: true
+          tag_name: ${{ env.TAG_STR }}
+          release_name: ${{ env.TAG_STR }}
+          draft: ${{ env.DRAFT_STR }}
+          prerelease: false
       - name: Upload the artifacts
         uses: skx/github-action-publish-binaries@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          releaseId: ${{ steps.createrelease.outputs.id }}
           args: 'ulysses-annotated*.epub'
-
-        
