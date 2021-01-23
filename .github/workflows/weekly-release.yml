@@ -10,35 +10,47 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@master
+      - name: install-deps
+        run: |
+          sudo apt-get update
+          sudo apt-get remove python
+          sudo apt-get install python3 tidy calibre python3-pip
+          sudo -H pip3 install setuptools
+          sudo -H pip3 install ebookmaker pytidylib
       - name: get ideacrawler
-        run: go get github.com/shsms/ideacrawler
+        run: |
+          go get github.com/shsms/ideacrawler
+          # git clone https://github.com/shsms/ideacrawler
+          # cd ideacrawler && go build
       - name: get mime
         run: |
           curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
           tar -xvf mime-linux-amd64.tar.gz
-          install mime /usr/bin/
+          chmod +x mime
       - name: download annotations
         run: |
-          ideacrawler &>/dev/null &
+          ~/go/bin/ideacrawler &>/dev/null &
           sleep 1
           make -C scripts download
           killall ideacrawler
+        timeout-minutes: 10
       - name: add annotations
         run: |
-          make -C scripts addanno
+          MIME=../mime make -C scripts addanno
       - name: generate epub
         run: |
+          export PATH=$PATH:${PWD}
           make -C scripts epub
       - name: env vars
         run: echo "MY_DATE=$(date +%Y.%m.%d)" >> $GITHUB_ENV
       - name: Create Release
-        id: weekly-rebuild
+        id: createrelease
         uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.MY_DATE }}
-          release_name: ${{ env.MY_DATE }}
+          tag_name: ${{ env.MY_DATE }}-alpha
+          release_name: ${{ env.MY_DATE }}-alpha
           draft: true
           prerelease: true
       - name: Upload the artifacts
@@ -46,6 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          releaseId: ${{ steps.createrelease.outputs.id }}
           args: 'ulysses-annotated*.epub'
 
         
