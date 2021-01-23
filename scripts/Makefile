@@ -13,13 +13,13 @@ epub:
 		--make epub.images \
 		--title Ulysses \
 		--author "James Joyce" \
-		--output-file ../ulysses-annotated.epub \
+		--output-file ../ulysses-annotated-monochrome.epub \
 		--cover ../cover.jpg \
 		/tmp/annotated.htm
 	ebookmaker \
 		--make epub.images \
 		--title Ulysses \
 		--author "James Joyce" \
-		--output-file ../ulysses-annotated-colour.epub \
+		--output-file ../ulysses-annotated.epub \
 		--cover ../cover.jpg \
 		/tmp/colour_annotated.htm

@@ -1,0 +1,51 @@
+on: workflow_dispatch
+# on:
+#   schedule:
+#     - cron:  '* 6 * * 0'
+name: Weekly rebuild
+jobs:
+  generate:
+    name: generate annotated epub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@master
+      - name: get ideacrawler
+        run: go get github.com/shsms/ideacrawler
+      - name: get mime
+        run: |
+          curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
+          tar -xvf mime-linux-amd64.tar.gz
+          install mime /usr/bin/
+      - name: download annotations
+        run: |
+          ideacrawler &>/dev/null &
+          sleep 1
+          make -C scripts download
+          killall ideacrawler
+      - name: add annotations
+        run: |
+          make -C scripts addanno
+      - name: generate epub
+        run: |
+          make -C scripts epub
+      - name: env vars
+        run: echo "MY_DATE=$(date +%Y.%m.%d)" >> $GITHUB_ENV
+      - name: Create Release
+        id: weekly-rebuild
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.MY_DATE }}
+          release_name: ${{ env.MY_DATE }}
+          draft: true
+          prerelease: true
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: 'ulysses-annotated*.epub'
+
+        
