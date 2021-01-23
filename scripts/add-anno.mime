@@ -409,7 +409,7 @@ def update_toc(epub) {
     epub.find("</div>");
     epub.paste("<br /> <div style=\"text-align: center;\">");
     epub.paste("<a href=\"#link2H_4_annotations\"> Annotations </a><br />");
-    epub.paste("<a href=\"#link2H_4_index_titles\"> Index of Titles </a><br /></div>");
+    epub.paste("<a href=\"#link2H_4_index_titles\"> Index of Notes </a><br /></div>");
 
     epub.find("<hr />");
     epub.paste(pagebreak);
@@ -543,13 +543,13 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
 def add_notes_index(epub, notes_index, index_cur, notes_cur) {
     epub.use_cursor(index_cur);
     epub.paste(pagebreak);
-    epub.paste("<h2>Index of Titles</h2>");
+    epub.paste("<h2>Index of Notes</h2>");
     epub.paste("<a name=\"link2H_4_index_titles\" id=\"link2H_4_index_titles\"> </a>\n")
     epub.paste("<p>All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note without locating its appearances in the text of the novel.</p>")
 
     epub.use_cursor(notes_cur);
     epub.paste(pagebreak);
-    epub.paste("<h3>Titles</h3>");
+    epub.paste("<h3>Notes</h3>");
 
     epub.use_cursor(index_cur);
     var count = 0;
