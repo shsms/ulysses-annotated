@@ -10,6 +10,7 @@ def parseargs() {
     parser.string_opt("infile", "path of the input file");
     parser.string_opt("outfile", "path of the output file");
     parser.string_opt("colour_outfile", "path of the colour coded output file");
+    parser.bool_opt("with_badges", "make stats badges for the github README.");
     return parser.parse();
 }
 
@@ -378,13 +379,13 @@ def update_css(epub) {
     epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
 }
 
-def replace_first_page(epub, date) {
+def replace_first_page(epub, filename, date) {
     epub.goto_pos(epub.find("<pre xml:space=\"preserve\">"));
     epub.set_mark();
     epub.find("</pre>");
     epub.erase_region();
 
-    var firstpage = buffer("firstpage.htm");
+    var firstpage = buffer(filename);
     firstpage.replace("%lastupdated%", date);
     epub.paste(firstpage.get_contents());
     epub.paste(pagebreak);
@@ -461,10 +462,11 @@ def penelope_reorder(epub) {
 }
 
 
-def add_notes(epub, main_cur, notes_cur, use_colour) {
+def add_notes(epub, main_cur, notes_cur, use_colour, stats) {
     var total = 0;
     var found = 0;
     var not_found = 0;
+    var annotation_failures = 0;
 
     var colours;
 
@@ -525,6 +527,7 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
 		    note_num += 1;
 		} else {
 		    print("annotation_failed-"+chapters[chapter] + ": " + text)
+		    annotation_failures += 1;
 		}
 		// print("text found: (" + chapters[chapter] + ") " + text);
 	    } else {
@@ -537,10 +540,14 @@ def add_notes(epub, main_cur, notes_cur, use_colour) {
     print("found:" + to_string(found))
     print("not_found:" + to_string(not_found))
 
+    stats["total"] = total  // referenced notes
+    stats["found"] = found  // matched references
+    stats["not_found"] = not_found // unmatched references
+    stats["broken_links"] = annotation_failures
     return notes_index;
 }
 
-def add_notes_index(epub, notes_index, index_cur, notes_cur) {
+def add_notes_index(epub, notes_index, index_cur, notes_cur, stats) {
     epub.use_cursor(index_cur);
     epub.paste(pagebreak);
     epub.paste("<h2>Index of Notes</h2>");
@@ -583,6 +590,7 @@ def add_notes_index(epub, notes_index, index_cur, notes_cur) {
 	}
     }
     print("distinct_notes: " + to_string(count))
+    stats["distinct_notes"] = count
 }
 
 def make_epub(use_colours, args, outfile) {
@@ -593,11 +601,17 @@ def make_epub(use_colours, args, outfile) {
     var notes_cur = epub.new_cursor();
     var index_cur = epub.new_cursor();
 
+    var stats = Map();
+
     epub.use_cursor(main_cur);
 
     add_epub_namespace(epub);
     update_css(epub);
-    replace_first_page(epub, args.date);
+    if(use_colours) {
+	replace_first_page(epub, "firstpage-colour.htm", args.date);
+    } else {
+	replace_first_page(epub, "firstpage-monochrome.htm", args.date);
+    }
     update_author_formatting(epub);
     update_toc(epub);
     insert_preface(epub);
@@ -606,7 +620,7 @@ def make_epub(use_colours, args, outfile) {
     prepare_main_cursor(epub, main_cur, end_pos);
     penelope_reorder(epub);
 
-    var notes_index = add_notes(epub, main_cur, notes_cur, use_colours);
+    var notes_index = add_notes(epub, main_cur, notes_cur, use_colours, stats);
 
     epub.use_cursor(notes_cur);
     var notes_cur_pos = epub.get_pos();
@@ -614,15 +628,75 @@ def make_epub(use_colours, args, outfile) {
     epub.use_cursor(index_cur);
     epub.goto_pos(notes_cur_pos);
     
-    add_notes_index(epub, notes_index, index_cur, notes_cur);
+    add_notes_index(epub, notes_index, index_cur, notes_cur, stats);
 
-    epub.save_as(outfile)
+    epub.save_as(outfile);
+
+    return stats;
+}
+
+def badge_json(key, value, colour) {
+    "{
+  \"schemaVersion\": 1,
+  \"label\": \""+key+"\",
+  \"message\": \"" + to_string(value) + "\",
+  \"color\": \"" + colour + "\"
+}
+"
+}
+
+def make_badges(stats) {
+    var colour = "green";
+    if (stats["total"] <= 0) {
+	colour = "red";
+    }
+    var buf = buffer();
+    buf.paste(badge_json("total references", stats["total"], colour));
+    buf.save_as("badge-total.json");
+
+    colour = "green";
+    if (stats["found"] <= 0) {
+	colour = "red";
+    } else if (stats["found"] < stats["total"]) {
+	colour = "orange";
+    }
+    buf.clear();
+    buf.paste(badge_json("matched references", stats["found"], colour));
+    buf.save_as("badge-found.json");
+
+    buf.clear();
+    colour = "green";
+    if (stats["not_found"] > 0) {
+	colour = "red";
+    }
+    buf.paste(badge_json("unmatched references", stats["not_found"], colour));
+    buf.save_as("badge-not-found.json");
+
+    buf.clear();
+    colour = "green";
+    if (stats["broken_links"] > 0) {
+	colour = "red";
+    }
+    buf.paste(badge_json("broken links", stats["broken_links"], colour));
+    buf.save_as("badge-broken-links.json");
+
+    buf.clear();
+    colour = "green";
+    if (stats["distinct_notes"] <= 0) {
+	colour = "red";
+    }
+    buf.paste(badge_json("distinct notes", stats["distinct_notes"], colour));
+    buf.save_as("badge-distinct.json");
 }
 
 def main() {
     var args = parseargs();
     make_epub(false, args, args.outfile)
-    make_epub(true, args, args.colour_outfile)
+    var stats = make_epub(true, args, args.colour_outfile)
+
+    if (args.with_badges) {
+	make_badges(stats)
+    }
 }
 
 main()

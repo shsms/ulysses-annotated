@@ -8,7 +8,7 @@ download:
 date=$(shell bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
 addanno:
 	${MIME} upd-epub-to-jp.mime --infile ../4300-h/4300-h.htm --outfile /tmp/updated-to-jp.htm
-	${MIME} add-anno.mime --date "${date}" --anno_path annotations-raw/ --infile /tmp/updated-to-jp.htm --outfile /tmp/annotated.htm --colour_outfile /tmp/colour_annotated.htm
+	${MIME} add-anno.mime --date "${date}" --anno_path annotations-raw/ --infile /tmp/updated-to-jp.htm --outfile /tmp/annotated.htm --colour_outfile /tmp/colour_annotated.htm --with_badges
 
 epub:
 	ebookmaker \

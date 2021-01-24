@@ -44,6 +44,8 @@ jobs:
       - name: add annotations
         run: |
           MIME=../mime make -C scripts addanno
+          mkdir -p reader/badges
+          cp scripts/badge-*json reader/badges/
 
       - name: generate epub
         run: |
