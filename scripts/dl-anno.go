@@ -29,8 +29,8 @@ func main() {
 		gc.CallbackURLRegexp(cfilter),
 		gc.FollowURLRegexp(ffilter),
 		gc.PageChan(gc.NewPageChan()),
-		gc.ThreadsPerSite(5),
-		gc.MinDelay(1),
+		gc.ThreadsPerSite(2),
+		gc.MinDelay(2),
 		gc.NoMimeType(),
 	)
 

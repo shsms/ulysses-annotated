@@ -40,7 +40,7 @@ jobs:
           sleep 1
           make -C scripts download
           killall ideacrawler
-        timeout-minutes: 10
+        timeout-minutes: 30
       - name: add annotations
         run: |
           MIME=../mime make -C scripts addanno
