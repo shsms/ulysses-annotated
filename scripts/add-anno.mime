@@ -37,6 +37,27 @@ global chapters = [
     "/index.php-penelope.htm"
 ]
 
+global chapter_names = [
+    "Telemachus",
+    "Nestor",
+    "Proteus",
+    "Calypso",
+    "Lotus Eaters",
+    "Hades",
+    "Aeolus",
+    "Lestrygonians",
+    "Scylla and Charybdis",
+    "Wandering Rocks",
+    "Sirens",
+    "Cyclops",
+    "Nausicaa",
+    "Oxen of the Sun",
+    "Circe",
+    "Eumaeus",
+    "Ithaca",
+    "Penelope"
+]
+
 global colour_files = [
     "/scripts/swap/aeolus.js",
     "/scripts/swap/calypso.js",
@@ -377,6 +398,7 @@ def update_css(epub) {
     epub.paste("p.preface { margin-bottom: 1.3em; }");
     epub.paste("p.preface-li { text-indent: 0; margin-bottom: 1.3em; }");
     epub.replace(".toc       { margin-left: 1%", ".toc       { margin-left: 0");
+    epub.replace(".toc2      { margin-left: 20%", ".toc2      { text-align: left; margin-left: 0");
 }
 
 def replace_first_page(epub, filename, date) {
@@ -404,11 +426,22 @@ def update_author_formatting(epub) {
 
 def update_toc(epub) {
     epub.find("<div class=\"toc\">");
+    epub.backward();
+    epub.paste(" style=\"text-align: center;\"");
+    epub.forward();
     epub.paste("<a href=\"#link2H_4_preface\"> Preface </a><br /><br />");
 
-    epub.find("[ 18 ]");
+    for(var ii = 1; ii <= 18; ++ii) {
+	var iis = to_string(ii)
+	var st = epub.find_fuzzy("[ " + iis + " ]");
+	epub.set_mark();
+	epub.goto_pos(st);
+	epub.erase_region();
+	epub.paste(" " + iis + " [" + chapter_names[ii-1] + "] ");
+    }
+
     epub.find("</div>");
-    epub.paste("<br /> <div style=\"text-align: center;\">");
+    epub.paste("<br /> <div>");
     epub.paste("<a href=\"#link2H_4_annotations\"> Annotations </a><br />");
     epub.paste("<a href=\"#link2H_4_index_titles\"> Index of Notes </a><br /></div>");
 
@@ -440,8 +473,6 @@ def prepare_notes_cursor(epub, notes_cur) {
 def prepare_main_cursor(epub, main_cur, end_pos) {
     epub.use_cursor(main_cur);
 
-    // go just before start of first chapter.
-    epub.find("<a name=\"link2HCH0001\" id=\"link2HCH0001\">");
     epub.set_mark();
     epub.goto_pos(end_pos);
     epub.narrow_to_region(); // so that we don't match with text that we added as footnotes.
@@ -461,6 +492,18 @@ def penelope_reorder(epub) {
     epub.start_of_buffer();
 }
 
+def fix_chapter_anchors(epub) {
+    epub.start_of_buffer();
+    while(epub.find("H2 anchor") >= 0) {
+	epub.find("</a>");
+	epub.set_mark();
+	epub.rfind("<a");
+	var anchor = epub.cut();
+	epub.find("</h2>");
+	epub.paste(anchor);
+    }
+    epub.start_of_buffer();
+}
 
 def add_notes(epub, main_cur, notes_cur, use_colour, stats) {
     var total = 0;
@@ -548,6 +591,7 @@ def add_notes(epub, main_cur, notes_cur, use_colour, stats) {
 }
 
 def add_notes_index(epub, notes_index, index_cur, notes_cur, stats) {
+    notes_index["S"]["Schemas"] = "notes/010046schemas.htm"
     epub.use_cursor(index_cur);
     epub.paste(pagebreak);
     epub.paste("<h2>Index of Notes</h2>");
@@ -619,6 +663,7 @@ def make_epub(use_colours, args, outfile) {
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
     penelope_reorder(epub);
+    fix_chapter_anchors(epub);
 
     var notes_index = add_notes(epub, main_cur, notes_cur, use_colours, stats);
 
