@@ -4,7 +4,7 @@
 
 <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fshsms.blog%2Fulysses-annotated%2Fbadges%2Fbadge-distinct.json"> <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fshsms.blog%2Fulysses-annotated%2Fbadges%2Fbadge-total.json"> <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fshsms.blog%2Fulysses-annotated%2Fbadges%2Fbadge-found.json"> <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fshsms.blog%2Fulysses-annotated%2Fbadges%2Fbadge-not-found.json"> <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fshsms.blog%2Fulysses-annotated%2Fbadges%2Fbadge-broken-links.json">
 
-* Read online: https://shsms.blog/ulysses-annotated/
+* Read online: https://shsms.github.io/ulysses-annotated/
 * Or download: http://www.joyceproject.com/pages/ebook.htm
 
 This is a git repository of the source files for the annotated epub version of Ulysses by Joyce, James.
