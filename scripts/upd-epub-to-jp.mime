@@ -48,6 +48,7 @@ class diff {
 };
 
 var items = [
+    // telem
     diff(
 	"his grey searching eyes",
 	"his great searching eyes"),
@@ -84,6 +85,7 @@ var items = [
 	"Übermensch.",
 	"Uebermensch."),
 
+    // nestor
     diff(
 	"tartan fillibegs",
 	"tartan filibegs"),
@@ -250,10 +252,20 @@ sun rising up"),
 	"women sculped Junonian",
 	"woman sculped Junonian"),
 
+    // scylla
     diff(
 	"<i>Homestead.</i>",
 	"<i>Homestead</i>."),
 
+    diff(
+	"<i>Amplius. Adhuc. Iterum. Postea.</i>",
+	"Just <i>Amplius. Adhuc. Iterum. Postea.</i>"),
+
+    diff(
+	"a shattering daylight of no thought.",
+	"a shattering daylight of no thoughts."),
+
+    // wrocks
     diff(
 	"John Conmee S. J.",
 	"John Conmee S.J."),
