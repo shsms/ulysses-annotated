@@ -405,6 +405,10 @@ P.: up"),
 	"lights the Erin’s King sails"),
 
     diff(
+	"a Scottish widow’s insurance policy",
+	"a Scottish widows’ insurance policy"),
+
+    diff(
 	"<i>(He cries.) Pater!</i> Free!",
 	"<i>Pater!</i> Free!"),
 
@@ -466,6 +470,10 @@ National Press</i> <i>"),
 	"sir James W. Mackey Limited,"),
 
     diff(
+	"postage stamps (7 schilling, mauve",
+	"postage stamps (7 shilling, mauve"),
+
+    diff(
 	"c/o. P. O. Dolphin",
 	"c/o P. O.\nDolphin"),
 
@@ -476,6 +484,10 @@ National Press</i> <i>"),
     diff(
 	"N. IGS./WI. UU. OX/W. OKS. MH/Y. IM",
 	"N. IGS. /WI. UU. OX/W. OKS.\nMH/Y. IM"),
+
+    diff(
+	"an endowment assurance policy of £ 500",
+	"an endowment assurance policy of &pound;500"),
 
     diff(
 	"An ancient haggadah book",
