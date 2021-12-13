@@ -25,3 +25,5 @@ epub:
 		--output-file ../ulysses-annotated.epub \
 		--cover ../cover.jpg \
 		/tmp/colour_annotated.htm
+	mv ../ulysses-annotated-monochrome.epub-images-epub.epub ../ulysses-annotated-monochrome.epub
+	mv ../ulysses-annotated.epub-images-epub.epub ../ulysses-annotated.epub
