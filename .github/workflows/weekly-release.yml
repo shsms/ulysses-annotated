@@ -28,7 +28,7 @@ jobs:
           sudo -H pip3 install ebookmaker pytidylib
       - name: get ideacrawler
         run: |
-          go get github.com/shsms/ideacrawler
+          go install github.com/shsms/ideacrawler@v1.0.1-0.20210103114145-eb05e956ef90
       - name: get mime
         run: |
           curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
