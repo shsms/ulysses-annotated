@@ -3,7 +3,7 @@ MIME ?= mime
 .PHONY: download addanno epub
 
 download:
-	GO111MODULE=off go run dl-anno.go annotations-raw/
+	go run dl-anno.go annotations-raw/
 
 date=$(shell bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
 addanno:
