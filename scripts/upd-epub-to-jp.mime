@@ -265,22 +265,62 @@ too."
 	"<i>Church Times.</i>",
 	"<i>Church Times</i>."),
 
+    // aeolus
     diff(
 	"<i>Weekly Freeman and National Press</i>",
 	"<i>Weekly Freeman</i><i>\nand National Press</i>"),
+
+    diff(
+        "mangiD kcirtaP.",
+        "mangiD. kcirtaP."
+    ),
 
     diff(
 	"Who the deuce scrawled all over those",
 	"Who the deuce scrawled all over these"),
 
     diff(
+        "A recently discovered fragment of Cicero, professor MacHugh
+      answered with pomp of tone.",
+        "A recently discovered fragment of Cicero’s, professor MacHugh answered
+with pomp of tone."
+    ),
+
+    diff(
 	"<i>Sport</i>’s tissues",
 	"<i>Sport’s</i> tissues"),
+
+    diff(
+        "Tay Pay who took him on to the <i>Star.</i>",
+        "Tay Pay who took him on to the <i>Star</i>."
+    ),
+
+    diff(
+        "oriafiamma</i>, gold of oriflamme, <i>di rimirar fè più ardenti.</i>",
+        "oriafiamma</i>, in gold of oriflamme, <i>di rimirar fè più ardenti.</i>"
+    ),
+
+    diff(
+        "only
+      for .... But no matter.",
+        "only for... But no matter."
+    ),
+
+    diff(
+        "A&mdash;sudden&mdash;at&mdash;the&mdash;moment&mdash;though&mdash;from&mdash;lingering&mdash;illness&mdash;often&mdash;previously&mdash;expectorated&mdash;demise",
+        "A sudden&#8211;at&#8211;the&#8211;moment&#8211;though&#8211;from&#8211;lingering&#8211;illness&#8211;often&#8211;previously&#8211;expectorated&#8211;demise"
+    ),
 
     diff(
 	"threepenny bits and sixpences",
 	"threepenny bits and a sixpence"),
 
+    diff(
+        "deus nobis hæc otia fecit.",
+        "deus nobis haec otia fecit."
+    ),
+
+    // lestry
     diff(
 	"£. s. d.",
 	"L.s.d."),

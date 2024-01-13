@@ -205,6 +205,18 @@ hoardings.</a> <a "
              )
 }
 
+def fix_aeolus(b) {
+    b.replace("href=\"notes/040103drouth.htm\">drouth. <a ", "href=\"notes/040103drouth.htm\">drouth.</a> <a ", 1);
+    b.replace(
+        "<i>...............latuapace 
+ ............che parlar ti piace
+....mentreche il vento, come fa, si tace.</i>",
+        "<i>........................ la tua pace
+    .................. che parlar ti piace
+    Mentre che il vento, come fa, si tace.</i>",
+        1);
+}
+
 def fix_nausicaa(b) {
     b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
@@ -235,6 +247,7 @@ def fix_mismatches(b, chapter) {
     case (0)  {fix_telem(b);	break;}
     case (2)  {fix_proteus(b);	break;}
     case (4)  {fix_lotus(b);	break;}
+    case (6)  {fix_aeolus(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
     case (15) {fix_eumaeus(b);  break;}
@@ -503,13 +516,27 @@ def lotus_reorder(epub) {
     epub.start_of_buffer();
 }
 
+def aeolus_reorder(epub) {
+    epub.find("Hell of a racket they make.")
+    epub.set_mark();
+    epub.find("Iron nerves.")
+    var passage_to_move = epub.cut();
+    // print(passage_to_move);
+    epub.rfind("He wants it in for July");
+    // epub.set_mark();
+    epub.find("</p>");
+    // print("\n\n" + epub.copy())
+    epub.paste("<p>" + passage_to_move + "</p>");
+    epub.start_of_buffer();
+}
+
 def penelope_reorder(epub) {
     epub.find("they hide it with a cabbageleaf");
     epub.set_mark();
     epub.find("kick or a bang of something there");
     var passage_to_move = epub.cut();
     // print(passage_to_move);
-    epub.set_mark();
+    // epub.set_mark();
     epub.find("go about like that I asked him");
     // print("\n\n" + epub.copy())
     epub.paste(passage_to_move);
@@ -687,6 +714,7 @@ def make_epub(use_colours, args, outfile) {
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
     lotus_reorder(epub);
+    aeolus_reorder(epub);
     penelope_reorder(epub);
     fix_chapter_anchors(epub);
 
