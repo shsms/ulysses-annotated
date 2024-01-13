@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
   "label": "unmatched references",
-  "message": "1218",
-  "color": "red"
+  "message": "0",
+  "color": "green"
 }
