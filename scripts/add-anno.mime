@@ -217,6 +217,35 @@ def fix_aeolus(b) {
         1);
 }
 
+def fix_lestry(b) {
+    b.replace(
+        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
+the way it curves there.
+</p>",
+        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
+the way it curves there.</a></p>",
+        1
+    );
+}
+
+def fix_wrocks(b) {
+    b.replace("* \n**", "<hr />");
+    b.start_of_buffer();
+    b.replace(
+        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.<a>",
+        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.</a>",
+        1
+    );
+}
+
+def fix_sirens(b) {
+    b.replace(
+        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.\n</p>",
+        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.</a></p>",
+        1
+    )
+}
+
 def fix_nausicaa(b) {
     b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
@@ -227,6 +256,16 @@ def fix_oxen(b) {
 
 def fix_eumaeus(b) {
     b.replace("&deg 9", "&deg; 9", 1)
+}
+
+def fix_ithaca(b) {
+    b.replace(
+        "href=\"notes/050084conversion.htm\">he had divulged his
+disbelief in the tenets of <a",
+        "href=\"notes/050084conversion.htm\">he had divulged his
+disbelief in the tenets of</a> <a",
+        1
+    );
 }
 
 def fix_penelope(b) {
@@ -248,9 +287,13 @@ def fix_mismatches(b, chapter) {
     case (2)  {fix_proteus(b);	break;}
     case (4)  {fix_lotus(b);	break;}
     case (6)  {fix_aeolus(b);	break;}
+    case (7)  {fix_lestry(b);	break;}
+    case (9)  {fix_wrocks(b);	break;}
+    case (10) {fix_sirens(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
     case (15) {fix_eumaeus(b);  break;}
+    case (16) {fix_ithaca(b);	break;}
     case (17) {fix_penelope(b); break;}
     }
     join_repeated_links(b, "</a> <a", " ");
