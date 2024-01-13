@@ -159,6 +159,7 @@ def fix_basics(b) {
 
     b.goto_pos(main_pos); b.replace("'",         "’");
     b.goto_pos(main_pos); b.replace(" <br />",   "");
+    b.goto_pos(main_pos); b.replace("<br/>",     "");
     b.goto_pos(main_pos); b.replace("<br />",    " ");
     b.goto_pos(main_pos); b.replace(" </i>",     "</i>");
     b.goto_pos(main_pos); b.replace("</i>!",     "!</i>");
@@ -172,6 +173,7 @@ def fix_basics(b) {
     b.goto_pos(main_pos); b.replace("&Eacute;",  "É");
     b.goto_pos(main_pos); b.replace("&agrave;",  "à");
     b.goto_pos(main_pos); b.replace("&egrave;",  "è");
+    b.goto_pos(main_pos); b.replace("&ugrave;",  "ù");
     b.goto_pos(main_pos); b.replace("&uuml;",    "ü");
     b.goto_pos(main_pos); b.replace("&#8212;",   "&mdash;");
 
@@ -216,8 +218,8 @@ def fix_mismatches(b, chapter) {
     fix_basics(b);
     b.start_of_buffer();
     var ch_num = to_string(chapter+1);
-    if(ch_num == "3") {
-	b.replace("[3]", "[ 3 ]", 1);
+    if(ch_num == "3" || ch_num == "10" || ch_num == "16") {
+	b.replace("["+ch_num+"]", "[ "+ch_num+" ]", 1);
     } else {
 	b.replace("<font size=\"+2\">["+ch_num+"]</font>", "[ "+ch_num+" ]", 1);
     }
