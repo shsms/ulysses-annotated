@@ -159,6 +159,7 @@ def fix_basics(b) {
 
     b.goto_pos(main_pos); b.replace("'",         "’");
     b.goto_pos(main_pos); b.replace(" <br />",   "");
+    b.goto_pos(main_pos); b.replace("<br/>",     "");
     b.goto_pos(main_pos); b.replace("<br />",    " ");
     b.goto_pos(main_pos); b.replace(" </i>",     "</i>");
     b.goto_pos(main_pos); b.replace("</i>!",     "!</i>");
@@ -172,6 +173,7 @@ def fix_basics(b) {
     b.goto_pos(main_pos); b.replace("&Eacute;",  "É");
     b.goto_pos(main_pos); b.replace("&agrave;",  "à");
     b.goto_pos(main_pos); b.replace("&egrave;",  "è");
+    b.goto_pos(main_pos); b.replace("&ugrave;",  "ù");
     b.goto_pos(main_pos); b.replace("&uuml;",    "ü");
     b.goto_pos(main_pos); b.replace("&#8212;",   "&mdash;");
 
@@ -195,6 +197,55 @@ def fix_proteus(b) {
 	      "href=\"notes/030022chaussons.htm\"><i>vous savez ah, oui!</i></a>", 1);
 }
 
+def fix_lotus(b) {
+    b.replace("<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
+hoardings. <a ",
+              "<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
+hoardings.</a> <a "
+             )
+}
+
+def fix_aeolus(b) {
+    b.replace("href=\"notes/040103drouth.htm\">drouth. <a ", "href=\"notes/040103drouth.htm\">drouth.</a> <a ", 1);
+    b.replace(
+        "<i>...............latuapace 
+ ............che parlar ti piace
+....mentreche il vento, come fa, si tace.</i>",
+        "<i>........................ la tua pace
+    .................. che parlar ti piace
+    Mentre che il vento, come fa, si tace.</i>",
+        1);
+}
+
+def fix_lestry(b) {
+    b.replace(
+        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
+the way it curves there.
+</p>",
+        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
+the way it curves there.</a></p>",
+        1
+    );
+}
+
+def fix_wrocks(b) {
+    b.replace("* \n**", "<hr />");
+    b.start_of_buffer();
+    b.replace(
+        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.<a>",
+        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.</a>",
+        1
+    );
+}
+
+def fix_sirens(b) {
+    b.replace(
+        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.\n</p>",
+        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.</a></p>",
+        1
+    )
+}
+
 def fix_nausicaa(b) {
     b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
@@ -207,6 +258,16 @@ def fix_eumaeus(b) {
     b.replace("&deg 9", "&deg; 9", 1)
 }
 
+def fix_ithaca(b) {
+    b.replace(
+        "href=\"notes/050084conversion.htm\">he had divulged his
+disbelief in the tenets of <a",
+        "href=\"notes/050084conversion.htm\">he had divulged his
+disbelief in the tenets of</a> <a",
+        1
+    );
+}
+
 def fix_penelope(b) {
     b.replace("enteric fever<a id=\"010058bloodyswindle10\" class=\"box-images\" href=\"notes/010058bloodyswindle.htm\"> he", "enteric fever he", 1);
     b.replace("evening we kissed goodbye <a", "evening we kissed goodbye</a> <a", 1);
@@ -216,17 +277,23 @@ def fix_mismatches(b, chapter) {
     fix_basics(b);
     b.start_of_buffer();
     var ch_num = to_string(chapter+1);
-    if(ch_num == "3") {
-	b.replace("[3]", "[ 3 ]", 1);
+    if(ch_num == "3" || ch_num == "10" || ch_num == "16") {
+	b.replace("["+ch_num+"]", "[ "+ch_num+" ]", 1);
     } else {
 	b.replace("<font size=\"+2\">["+ch_num+"]</font>", "[ "+ch_num+" ]", 1);
     }
     switch(chapter) {
     case (0)  {fix_telem(b);	break;}
     case (2)  {fix_proteus(b);	break;}
+    case (4)  {fix_lotus(b);	break;}
+    case (6)  {fix_aeolus(b);	break;}
+    case (7)  {fix_lestry(b);	break;}
+    case (9)  {fix_wrocks(b);	break;}
+    case (10) {fix_sirens(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
     case (15) {fix_eumaeus(b);  break;}
+    case (16) {fix_ithaca(b);	break;}
     case (17) {fix_penelope(b); break;}
     }
     join_repeated_links(b, "</a> <a", " ");
@@ -479,13 +546,40 @@ def prepare_main_cursor(epub, main_cur, end_pos) {
     epub.start_of_buffer();  // goes to start of narrowed region.
 }
 
+def lotus_reorder(epub) {
+    epub.find("saint Peter Claver and the African Mission.");
+    epub.set_mark();
+    epub.find("religion.");
+    var passage_to_move = epub.cut();
+    // print(passage_to_move);
+    // epub.set_mark();
+    epub.find("Rank heresy for them. ");
+    // print("\n\n" + epub.copy())
+    epub.paste(passage_to_move);
+    epub.start_of_buffer();
+}
+
+def aeolus_reorder(epub) {
+    epub.find("Hell of a racket they make.")
+    epub.set_mark();
+    epub.find("Iron nerves.")
+    var passage_to_move = epub.cut();
+    // print(passage_to_move);
+    epub.rfind("He wants it in for July");
+    // epub.set_mark();
+    epub.find("</p>");
+    // print("\n\n" + epub.copy())
+    epub.paste("<p>" + passage_to_move + "</p>");
+    epub.start_of_buffer();
+}
+
 def penelope_reorder(epub) {
     epub.find("they hide it with a cabbageleaf");
     epub.set_mark();
     epub.find("kick or a bang of something there");
     var passage_to_move = epub.cut();
     // print(passage_to_move);
-    epub.set_mark();
+    // epub.set_mark();
     epub.find("go about like that I asked him");
     // print("\n\n" + epub.copy())
     epub.paste(passage_to_move);
@@ -662,6 +756,8 @@ def make_epub(use_colours, args, outfile) {
 
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
+    lotus_reorder(epub);
+    aeolus_reorder(epub);
     penelope_reorder(epub);
     fix_chapter_anchors(epub);
 

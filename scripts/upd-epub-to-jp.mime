@@ -87,6 +87,10 @@ var items = [
 
     // nestor
     diff(
+        "the library of Saint Genevieve",
+        "the library of Sainte Geneviève"),
+
+    diff(
 	"tartan fillibegs",
 	"tartan filibegs"),
 
@@ -110,6 +114,7 @@ var items = [
 	"<i>&mdash;The Evening Telegraph...</i>",
 	"<i>The Evening Telegraph</i>..."),
 
+    // proteus
     diff(
 	"Hello. Kinch here. Put me",
 	"Hello! Kinch here. Put me"),
@@ -139,6 +144,12 @@ a widowed see, with upstiffed omophorion"),
 	"setier!"),
 
     diff(
+        "<i>Il est irlandais. Hollandais? Non fromage. Deux irlandais, nous,
+      Irlande, vous savez ah, oui!</i>",
+        "<i>Il est irlandais. Hollandais? Non fromage. Deux irlandais,
+nous, Irlande, vous savez? Ah, oui!</i>"),
+
+    diff(
 	" ensablé</i> Louis",
 	" ensablé</i>, Louis"),
 
@@ -150,6 +161,7 @@ a widowed see, with upstiffed omophorion"),
 	"he woke me last night",
 	"he woke me up last night"),
 
+    // calypso
     diff(
 	"three, four: right",
 	"three, four : right"),
@@ -171,6 +183,11 @@ a widowed see, with upstiffed omophorion"),
 	"metempsychosis"),
 
     diff(
+        "Everyone says I am quite the belle in my new tam.",
+        "Everyone says I’m quite the belle in my new tam."
+    ),
+
+    diff(
 	"XL Café",
 	"XL Cafe"),
 
@@ -178,19 +195,78 @@ a widowed see, with upstiffed omophorion"),
 	"Funny I don’t",
 	"Funny, I don’t"),
 
+    // lotus
+    diff(
+        "Girl in Eustace
+      street hallway Monday was it settling her garter. Her friend covering the
+      display of. <i>Esprit de corps</i>. Well, what are you gaping at?",
+        "Girl in Eustace
+street hallway Monday was it settling her garter. Her friend covering
+the display of <i>esprit de corps</i>. Well, what are you gaping at?"
+    ),
+
+    diff(
+        "Nathan’s voice! His son’s voice! I hear the voice of Nathan who left his
+      father to die of grief and misery in my arms, who left the house of his
+      father and left the God of his father.",
+        "&mdash;Nathan’s voice! His son’s voice! I hear the voice of Nathan who left his
+father to die of grief and misery in my arms, who left the house of his
+father and left the God of his father."
+    ),
+
+    diff(
+        "<i>O, Mairy lost the pin of her drawers.
+     She didn’t know what to do
+     To keep it up,
+     To keep it up.</i>",
+        " <i>O, Mairy lost the pin of her drawers. 
+     She didn’t know what to do
+     To keep it up
+     To keep it up.</i>"
+    ),
+
     diff(
 	"John Conmee S. J. on saint Peter Claver S. J.",
     "John Conmee S.J.
 on saint Peter Claver"),
 
     diff(
+        "Prayers for the
+      conversion of Gladstone they had too when he was almost unconscious. The
+      protestants are the same. Convert Dr William J. Walsh D.D. to the true
+      religion.",
+        "Prayers for the
+conversion of Gladstone they had too when he was almost unconscious. The
+protestants are the same. Convert Dr William J. Walsh D.D. to the true
+religion."
+    ),
+
+    diff(
+        "They don’t seem to chew it: only swallow it
+      down. Rum idea: eating bits of a corpse. Why the cannibals cotton to it.",
+        "They
+don’t seem to chew it: only swallow it down. Rum idea: eating bits of a
+corpse why the cannibals cotton to it."
+    ),
+
+    diff(
 	"Peter Carey, yes. No, Peter Claver",
 	"Peter Carey. No, Peter Claver"),
+
+    diff(
+        "Those old popes keen on
+      music, on art and statues and pictures of all kinds. Palestrina for
+      example too.",
+        "Those old popes were keen on music,
+on art and statues and pictures of all kinds. Palestrina for example
+too."
+    ),
 
     diff(
 	"Still Captain Culler",
 	"Still Captain Buller"),
 
+    // hades
     diff(
 	"slammed it twice till it",
 	"slammed it tight till it"),
@@ -200,6 +276,12 @@ on saint Peter Claver"),
 	"Wallace Bros the\nbottleworks. Dodder bridge."),
 
     diff(
+        "Secret eyes,
+      secretsearching. Mason, I think: not sure.",
+        "Secret
+eyes, secretsearching eyes. Mason, I think: not sure."),
+
+    diff(
 	"Wonder he had the gumption to propose to any girl.",
 	"Wonder how he had the gumption to propose to any girl."),
 
@@ -207,22 +289,62 @@ on saint Peter Claver"),
 	"<i>Church Times.</i>",
 	"<i>Church Times</i>."),
 
+    // aeolus
     diff(
 	"<i>Weekly Freeman and National Press</i>",
 	"<i>Weekly Freeman</i><i>\nand National Press</i>"),
+
+    diff(
+        "mangiD kcirtaP.",
+        "mangiD. kcirtaP."
+    ),
 
     diff(
 	"Who the deuce scrawled all over those",
 	"Who the deuce scrawled all over these"),
 
     diff(
+        "A recently discovered fragment of Cicero, professor MacHugh
+      answered with pomp of tone.",
+        "A recently discovered fragment of Cicero’s, professor MacHugh answered
+with pomp of tone."
+    ),
+
+    diff(
 	"<i>Sport</i>’s tissues",
 	"<i>Sport’s</i> tissues"),
+
+    diff(
+        "Tay Pay who took him on to the <i>Star.</i>",
+        "Tay Pay who took him on to the <i>Star</i>."
+    ),
+
+    diff(
+        "oriafiamma</i>, gold of oriflamme, <i>di rimirar fè più ardenti.</i>",
+        "oriafiamma</i>, in gold of oriflamme, <i>di rimirar fè più ardenti.</i>"
+    ),
+
+    diff(
+        "only
+      for .... But no matter.",
+        "only for... But no matter."
+    ),
+
+    diff(
+        "A&mdash;sudden&mdash;at&mdash;the&mdash;moment&mdash;though&mdash;from&mdash;lingering&mdash;illness&mdash;often&mdash;previously&mdash;expectorated&mdash;demise",
+        "A sudden&#8211;at&#8211;the&#8211;moment&#8211;though&#8211;from&#8211;lingering&#8211;illness&#8211;often&#8211;previously&#8211;expectorated&#8211;demise"
+    ),
 
     diff(
 	"threepenny bits and sixpences",
 	"threepenny bits and a sixpence"),
 
+    diff(
+        "deus nobis hæc otia fecit.",
+        "deus nobis haec otia fecit."
+    ),
+
+    // lestry
     diff(
 	"£. s. d.",
 	"L.s.d."),
@@ -236,9 +358,42 @@ on saint Peter Claver"),
 	"Express</i>."),
 
     diff(
+        "Peaceful eyes. Weight off their mind.",
+        "Peaceful eyes. Weight off their minds."
+    ),
+
+    diff(
+        "Barmaids too. Tobaccoshopgirls.",
+        "Barmaids too. Tobacco shopgirls."
+    ),
+
+    diff(
 	"Homerule sun rising up",
-    "Home Rule
-sun rising up"),
+    "Home Rule sun rising up"),
+
+    diff(
+        "Drop into the D.B.C. probably for his coffee, play chess there.",
+        "Drop into the D. B. C. probably for his coffee, play chess there."
+    ),
+
+    diff(
+        "Now that I come to think of it that ball falls at Greenwich time. It’s the
+      clock is worked by an electric wire from Dunsink. Must go out there some
+      first Saturday of the month. If I could get an introduction to professor
+      Joly or learn up something about his family. That would do to: man always
+      feels complimented. Flattery where least expected. Nobleman proud to be
+      descended from some king’s mistress. His foremother. Lay it on with a
+      trowel. Cap in hand goes through the land. Not go in and blurt out what
+      you know you’re not to: what’s parallax?",
+        "Now that I come to think of it, that ball falls at Greenwich time. It’s
+the clock is worked by an electric wire from Dunsink. Must go out there
+some first Saturday of the month. If I could get an introduction to
+professor Joly or learn up something about his family. That would do to:
+man always feels complimented. Flattery where least expected. Nobleman
+proud to be descended from some king’s mistress. His foremother. Lay it
+on with a trowel. Cap in hand goes through the land. Not go in and blurt
+out what you know you’re not to: what’s parallax?"
+    ),
 
     diff(
 	"Spat-on sawdust, sweetish warmish cigarettesmoke",
@@ -251,6 +406,33 @@ sun rising up"),
     diff(
 	"women sculped Junonian",
 	"woman sculped Junonian"),
+
+    diff(
+        "<i>Why I left the church
+      of Rome? Birds’ Nest.</i> Women run him. They say they used to give pauper
+      children soup to change to protestants in the time of the potato blight.
+      Society over the way papa went to for the conversion of poor jews. Same
+      bait. Why we left the church of Rome.",
+        "<i>Why I left the church
+of Rome.</i> Birds’ nest women run him. They say they used to give pauper
+children soup to change to protestants in the time of the potato blight.
+Society over the way papa went to for the conversion of poor jews. Same
+bait. Why we left the church of Rome."
+    ),
+
+    diff(
+        "The devil on moneylenders. Gave
+      Reuben J a great strawcalling. Now he’s really what they call a dirty
+      jew.",
+        "The devil
+on moneylenders. Gave Reuben J. a great strawcalling. Now he’s really
+what they call a dirty jew."
+    ),
+
+    diff(
+        "Ah soap there I yes. Gate.",
+        "Ah, soap there! Yes. Gate."
+    ),
 
     // scylla
     diff(
@@ -271,16 +453,62 @@ sun rising up"),
 	"John Conmee S.J."),
 
     diff(
+        "On Newcomen bridge the very reverend John Conmee S. J. of saint Francis
+      Xavier’s church, upper Gardiner street, stepped on to an outward bound
+      tram.",
+        "On Newcomen bridge the very reverend John Conmee S.J. of saint Francis
+Xavier’s church, upper Gardiner street, stepped on to an outward bound
+tram."
+    ),
+
+    diff(
+        "<i>&mdash;Ma!</i> Almidano Artifoni said.",
+        "&mdash;<i>Ma!</i> Almidano Artifoni said."
+    ),
+
+    diff(
+        "&mdash;<i>Anch’io ho avuto di queste idee</i>, Almidano Artifoni said, <i>quand’
+      ero giovine come Lei. Eppoi mi sono convinto che il mondo è una bestia. È
+      peccato. Perchè la sua voce... sarebbe un cespite di rendita, via. Invece,
+      Lei si sacrifica.</i>",
+        "&mdash;<i>Anch’io ho avuto di queste idee,</i> Almidano Artifoni said <i>quand’ ero
+giovine come Lei. Eppoi mi sono convinto che il mondo è una bestia.
+È peccato. Perchè la sua voce... sarebbe un cespite di rendita, via.
+Invece, Lei si sacrifica.</i>"
+    ),
+
+    diff(
 	"<i>General Slocum</i> explosion.",
 	"General Slocum explosion."),
 
     diff(
-	"girl.</i>",
-	"girl</i>."),
+        "We call it D.B.C. because they have damn bad cakes.",
+        "We call it D. B. C. because they have damn bad cakes."
+    ),
 
+    diff(
+        "I hope he’s in purgatory now because he went to confession",
+        "I hope he is in purgatory now because he went to confession"
+    ),
+
+    diff(
+        "Richie Goulding with the costbag of Goulding, Collis and Ward",
+        "Richie Goulding with the costsbag of Goulding, Collis and Ward"
+    ),
+
+    diff(
+	"<i>My girl’s a Yorkshire girl.</i>",
+	"<i>My girl’s a Yorkshire girl</i>."),
+
+    // sirens
     diff(
 	"All gone. All fallen.",
 	"Naminedamine. All gone. All fallen."),
+
+    diff(
+        "Imperthnthn thnthnthn, bootssnout sniffed rudely",
+        "Imperthnthn thnthnthn, bootsnout sniffed rudely"
+    ),
 
     diff(
 	"to greaseabloom.",
@@ -288,8 +516,7 @@ sun rising up"),
 
     diff(
 	"the door of the bar and diningroom",
-    "the door of the
-diningroom"),
+        "the door of the diningroom"),
 
     diff(
 	"<i>to Flora’s lips",
@@ -305,8 +532,17 @@ diningroom"),
 
     diff(
 	"U. P: up",
-    "U.
-P.: up"),
+    "U. P.: up"),
+
+    diff(
+        "&mdash;What key? Six sharps?",
+        "&mdash; What key? Six sharps?"
+    ),
+
+    diff(
+        "&mdash;F sharp major, Ben Dollard said.",
+        "&mdash; F sharp major, Ben Dollard said."
+    ),
 
     diff(
 	"how solemn fell his footsteps there",
@@ -324,13 +560,32 @@ P.: up"),
 	"Can leave that <i>Freeman</i>.",
 	"Can leave that Freeman."),
 
+    // cyclops
     diff(
-	"with U. p: up on it",
-	"with u. p.: up on it"),
+        "with U. p: up on it",
+        "with u. p.: up on it"),
 
     diff(
-	"a straw</i>.",
-	"a straw.</i>"),
+        "<i>&mdash;Bi i dho husht,</i>",
+        "&mdash;<i>Bi i dho husht,</i>"
+    ),
+
+    diff(
+        "a straw</i>.",
+        "a straw.</i>"),
+
+    diff(
+        "Ay, says Alf. Reuben J was bloody lucky",
+        "Ay, says Alf. Reuben J. was bloody lucky"
+    ),
+
+    // nausicaa
+    diff(
+        "though she didn’t like her mother’s
+      taking pinches of snuff and that was the only single thing they ever had
+      words about, taking snuff",
+        "though she didn’t like her mother taking pinches of snuff and that was the only single thing they ever had words about, taking snuff"
+    ),
 
     diff(
 	"Featherbed mountain.",
@@ -344,6 +599,7 @@ P.: up"),
 	"<i>Cuckoo Cuckoo Cuckoo.</i>",
 	"<i>Cuckoo. Cuckoo. Cuckoo.</i>"),
 
+    // oxen
     diff(
 	"allhardest of woman",
 	"all hardest of woman"),
@@ -364,6 +620,7 @@ P.: up"),
 	"O lust our refuge and our strength.",
 	"O,\nlust, our refuge and our strength."),
 
+    // circe
     diff(
 	"U. p: up.",
 	"U. p.: Up."),
@@ -393,16 +650,44 @@ P.: up"),
 	"Lorcan Sherlock, locum tenens. "),
 
     diff(
+        "Reuben J Dodd, blackbearded Iscariot, bad shepherd",
+        "Reuben J. Dodd, blackbearded Iscariot, bad shepherd"
+    ),
+
+    diff(
 	"chorus from Handel’s Messiah",
 	"the Alleluia chorus"),
 
     diff(
-	"teabrown artcolours",
-	"</i> <i>teabrown artcolours</i> <i>"),
+        "Reuben J Antichrist, wandering jew",
+        "Reuben J. Antichrist, wandering jew"
+    ),
+
+    diff(
+        "Ben Jumbo Dollard, rubicund, musclebound, hairynostrilled,
+      hugebearded, cabbageeared, shaggychested, shockmaned, fatpapped, stands
+      forth, his loins and genitals tightened into a pair of black bathing
+      bagslops.",
+        "Ben Jumbo Dollard, rubicund, musclebound, hairynostrilled,
+hugebearded, cabbageeared, shaggychested, shockmaned, fat-papped, stands
+forth, his loins and genitals tightened into a pair of black bathing
+bagslops."
+    ),
+
+    diff(
+	"teabrown artcolours, descends from her grotto and
+      passing under interlacing yews stands over Bloom.",
+	"</i> <i>teabrown artcolours</i>, <i>descends from her
+grotto and passing under interlacing yews stands over Bloom."),
 
     diff(
 	"lights the</i> Erin’s King <i>sails",
 	"lights the Erin’s King sails"),
+
+    diff(
+        "She clutches again in her robe.",
+        "She clutches in her robe."
+    ),
 
     diff(
 	"a Scottish widow’s insurance policy",
@@ -417,12 +702,44 @@ P.: up"),
 	"Yet I’ve a sort a"),
 
     diff(
+        "Struggle for
+      life is the law of existence but but human philirenists, notably the tsar
+      and the king of England, have invented arbitration.",
+        "Struggle
+for life is the law of existence but human philirenists, notably the
+tsar and the king of England, have invented arbitration."
+    ),
+
+    diff(
 	"a plasterer’s bucket",
 	"</i> <i>a plasterer’s bucket"),
+
+    // eumaeus
+    diff(
+        "Bow to the
+      inevitable. Grin and bear it. I remain with much love your brokenhearted
+      husband W. B. Murphy.",
+        "Bow to the inevitable. Grin and bear it. I remain with much love your brokenhearted husband D. B. Murphy."
+    ),
 
     diff(
 	"simply letting spirt a jet of spew",
 	"simply letting spurt a jet of spew"),
+
+    diff(
+        "it is a simple substance and
+      therefore incorruptible. It would be immortal, I understand, but for the
+      possibility of its annihilation by its First Cause Who, from all I can
+      hear, is quite capable of adding that to the number of His other practical
+      jokes, <i>corruptio per se</i> and <i>corruptio per accidens</i> both
+      being excluded by court etiquette.",
+        "it is a simple substance and
+therefore incorruptible. It would be immortal, I understand, but for the
+possibility of its annihilation by its First Cause, Who, from all I
+can hear, is quite capable of adding that to the number of His other
+practical jokes, <i>corruptio per se</i> and <i>corruptio per accidens</i> both
+being excluded by court etiquette."
+    ),
 
     diff(
 	"triangle Miss Portinari he",
@@ -445,8 +762,27 @@ P.: up"),
 	"you are... But in the economic, not touching religion, domain, the priest"),
 
     diff(
+        "the lives of the submerged tenth, viz. coalminers, divers, scavengers
+      etc., were very much under the microscope lately",
+        "the lives of the submerged tenth, viz.,
+coalminers, divers, scavengers, etc., were very much under the microscope
+lately"
+    ),
+
+    diff(
 	"edition extra sporting of the <i>Telegraph</i> tell",
 	"edition, extra sporting, of the <i>Telegraph</i>, tell"),
+
+    diff(
+        "Ascot meeting, the Gold Cup.
+      Victory of outsider <i>Throwaway</i> recalls Derby of ’92 when Capt.
+      Marshall’s dark horse <i>Sir Hugo</i> captured the blue ribband at long
+      odds.",
+        "Ascot
+<i>Throwaway</i> recalls Derby of ’92 when
+Captain Marshall’s dark horse, <i>Sir Hugo</i>, captured the blue ribband at long
+odds."
+    ),
 
     diff(
 	"New York disaster. thousand",
@@ -457,13 +793,61 @@ P.: up"),
 	"n&deg; 9 Newbridge Avenue"),
 
     diff(
-	"ship of the street was manœuvring",
-	"ship of the street was\nmanoeuvring"),
+        "Cornelius T. Kelleher, Joseph M’C Hynes, L. Boom, C P
+      M’Coy,&mdash;M’Intosh",
+        "Cornelius Kelleher, Joseph M’C Hynes, L. Boom, C P
+      M’Coy,&mdash;M’lntosh"
+    ),
 
+    diff(
+        "the account of the third event at Ascot on page three, his side.
+      Value 1000 sovs with 3000 sovs in specie added. For entire colts and
+      fillies. Mr F. Alexander’s <i>Throwaway</i>, b. h. by <i>Rightaway-Thrale</i>, 5
+      yrs, 9 st 4 lbs (W. Lane) 1. Lord Howard de Walden’s <i>Zinfandel</i> (M.
+      Cannon) 2. Mr W. Bass’s <i>Sceptre</i> 3. Betting 5 to 4 on <i>Zinfandel</i>,
+      20 to 1 <i>Throwaway</i> (off). <i>Sceptre</i> a shade heavier. It was anybody’s race then the rank outsider drew to
+      the fore, got long lead, beating Lord Howard de Walden’s chestnut colt and
+      Mr W. Bass’s bay filly Sceptre on a 2 1/2 mile course. Winner trained by
+      Braime so that Lenehan’s version of the business was all pure buncombe.
+      Secured the verdict cleverly by a length. 1000 sovs with 3000 in specie.
+      Also ran: J de Bremond’s (French horse Bantam Lyons was anxiously
+      inquiring after not in yet but expected any minute) <i>Maximum II</i>.",
+        "the account of the third event at Ascot on page three,
+his sidevalue 1,000 sovs., with 3,000 sovs. in specie added for entire
+colts and fillies, Mr F. Alexander’s <i>Throwaway</i>, b. h. by <i>Rightaway</i>,
+5 yrs, 9 st 4 lbs, Thrale (W. Lane) 1. Lord Howard de Walden’s <i>Zinfandel</i> (M.
+Cannon) 2. Mr W. Bass’s <i>Sceptre</i> 3. Betting 5 to 4 on <i>Zinfandel</i>,
+20 to 1 <i>Throwaway</i> (off).<i> Throwaway</i> and <i>Zinfandel</i>
+stood close order. It was anybody’s race then the rank outsider drew to
+the fore got long lead, beating lord Howard de Walden’s chestnut
+colt and Mr W. Bass’s bay filly Sceptre on a 2½ mile course. Winner
+trained by Braine so that Lenehan’s version of the business was all pure
+buncombe. Secured the verdict cleverly by a length. 1,000 sovs. with
+3000 in specie. Also ran: J. de Bremond’s (French horse Bantam Lyons was
+anxiously inquiring after not in yet but expected any minute) <i>Maximum
+II</i>."
+    ),
+
+    diff(
+	"ship of the street was manœuvring",
+	"ship of the street was manoeuvring"),
+
+    // ithaca
     diff(
 	"Freeman’s Journal</i> and <i>National Press",
     "</i> <i>Freeman’s Journal and
 National Press</i> <i>"),
+
+    diff(
+        "picked at and gently lacerated the protruding part of the
+      great toenail, raised the part lacerated to his nostrils and inhaled the
+      odour of the quick, then, with satisfaction, threw away the lacerated
+      ungual fragment",
+        "picked at and gently lacerated the protruding
+part of the great toenail, raised the part lacerated to his nostrils and
+inhaled the odour of the quick, then, with satisfaction, threw away the
+lacerated unguical fragment"
+    ),
 
     diff(
 	"sir James W. Mackey (Limited)",
@@ -478,12 +862,14 @@ National Press</i> <i>"),
 	"c/o P. O.\nDolphin"),
 
     diff(
-	"reversed alphabetic boustrophedonic",
-	"reversed alphabetic boustrophedontic"),
-
-    diff(
-	"N. IGS./WI. UU. OX/W. OKS. MH/Y. IM",
-	"N. IGS. /WI. UU. OX/W. OKS.\nMH/Y. IM"),
+        "the transliterated name and address of the addresser of the 3 letters in
+      reversed alphabetic boustrophedonic punctated quadrilinear cryptogram
+      (vowels suppressed) N. IGS./WI. UU. OX/W. OKS. MH/Y. IM",
+        "the transliterated name and address of the addresser
+of the 3 letters in reversed alphabetic boustrophedonic punctated
+quadrilinear cryptogram (vowels suppressed) N. IGS. /WI. UU. OX/W. OKS.
+MH/Y. IM"
+	),
 
     diff(
 	"an endowment assurance policy of £ 500",
@@ -497,6 +883,7 @@ National Press</i> <i>"),
 	"<i>City Arms</i> hotel",
 	"City Arms hotel"),
 
+    // penelope
     diff(
 	"for £ 10000 for a postcard U p up",
 	"for &pound;10000 for a postcard up up"),
@@ -505,9 +892,14 @@ National Press</i> <i>"),
 	"coming man Griffiths is",
 	"coming man Griffith is"),
 
-    // diff(
-    // "evening we kissed goodbye <a",
-    // "evening we kissed goodbye <a"),
+    diff(
+        "that blue suit he had on and stylish tie and
+      socks with the skyblue silk things on them hes certainly welloff I know
+      by the cut his clothes have",
+        "that blue suit he had on and stylish tie and socks
+with the skyblue silk things on them hes certainly well off I know by
+the cut his clothes have"
+    ),
 
     diff(
 	"deaead days beyondre call",
