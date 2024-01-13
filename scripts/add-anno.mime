@@ -197,6 +197,14 @@ def fix_proteus(b) {
 	      "href=\"notes/030022chaussons.htm\"><i>vous savez ah, oui!</i></a>", 1);
 }
 
+def fix_lotus(b) {
+    b.replace("<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
+hoardings. <a ",
+              "<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
+hoardings.</a> <a "
+             )
+}
+
 def fix_nausicaa(b) {
     b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
@@ -226,6 +234,7 @@ def fix_mismatches(b, chapter) {
     switch(chapter) {
     case (0)  {fix_telem(b);	break;}
     case (2)  {fix_proteus(b);	break;}
+    case (4)  {fix_lotus(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
     case (15) {fix_eumaeus(b);  break;}
@@ -481,6 +490,19 @@ def prepare_main_cursor(epub, main_cur, end_pos) {
     epub.start_of_buffer();  // goes to start of narrowed region.
 }
 
+def lotus_reorder(epub) {
+    epub.find("saint Peter Claver and the African Mission.");
+    epub.set_mark();
+    epub.find("religion.");
+    var passage_to_move = epub.cut();
+    // print(passage_to_move);
+    // epub.set_mark();
+    epub.find("Rank heresy for them. ");
+    // print("\n\n" + epub.copy())
+    epub.paste(passage_to_move);
+    epub.start_of_buffer();
+}
+
 def penelope_reorder(epub) {
     epub.find("they hide it with a cabbageleaf");
     epub.set_mark();
@@ -664,6 +686,7 @@ def make_epub(use_colours, args, outfile) {
 
     var end_pos = prepare_notes_cursor(epub, notes_cur);
     prepare_main_cursor(epub, main_cur, end_pos);
+    lotus_reorder(epub);
     penelope_reorder(epub);
     fix_chapter_anchors(epub);
 

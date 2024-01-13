@@ -178,14 +178,72 @@ a widowed see, with upstiffed omophorion"),
 	"Funny I don’t",
 	"Funny, I don’t"),
 
+    // lotus
+    diff(
+        "Girl in Eustace
+      street hallway Monday was it settling her garter. Her friend covering the
+      display of. <i>Esprit de corps</i>. Well, what are you gaping at?",
+        "Girl in Eustace
+street hallway Monday was it settling her garter. Her friend covering
+the display of <i>esprit de corps</i>. Well, what are you gaping at?"
+    ),
+
+    diff(
+        "Nathan’s voice! His son’s voice! I hear the voice of Nathan who left his
+      father to die of grief and misery in my arms, who left the house of his
+      father and left the God of his father.",
+        "&mdash;Nathan’s voice! His son’s voice! I hear the voice of Nathan who left his
+father to die of grief and misery in my arms, who left the house of his
+father and left the God of his father."
+    ),
+
+    diff(
+        "<i>O, Mairy lost the pin of her drawers.
+     She didn’t know what to do
+     To keep it up,
+     To keep it up.</i>",
+        " <i>O, Mairy lost the pin of her drawers. 
+     She didn’t know what to do
+     To keep it up
+     To keep it up.</i>"
+    ),
+
     diff(
 	"John Conmee S. J. on saint Peter Claver S. J.",
     "John Conmee S.J.
 on saint Peter Claver"),
 
     diff(
+        "Prayers for the
+      conversion of Gladstone they had too when he was almost unconscious. The
+      protestants are the same. Convert Dr William J. Walsh D.D. to the true
+      religion.",
+        "Prayers for the
+conversion of Gladstone they had too when he was almost unconscious. The
+protestants are the same. Convert Dr William J. Walsh D.D. to the true
+religion."
+    ),
+
+    diff(
+        "They don’t seem to chew it: only swallow it
+      down. Rum idea: eating bits of a corpse. Why the cannibals cotton to it.",
+        "They
+don’t seem to chew it: only swallow it down. Rum idea: eating bits of a
+corpse why the cannibals cotton to it."
+    ),
+
+    diff(
 	"Peter Carey, yes. No, Peter Claver",
 	"Peter Carey. No, Peter Claver"),
+
+    diff(
+        "Those old popes keen on
+      music, on art and statues and pictures of all kinds. Palestrina for
+      example too.",
+        "Those old popes were keen on music,
+on art and statues and pictures of all kinds. Palestrina for example
+too."
+    ),
 
     diff(
 	"Still Captain Culler",
