@@ -596,6 +596,15 @@ Invece, Lei si sacrifica.</i>"
 	"the Gold Cup race!"),
 
     diff(
+        "Dreamt last night?
+      Wait. Something confused. She had red slippers on. Turkish. Wore the
+      breeches. Suppose she does?",
+        "Dreamt last night? Wait.
+Something confused. She had red slippers on. Turkish. Wore the breeches.
+Suppose she does."
+        ),
+
+    diff(
 	"<i>Cuckoo Cuckoo Cuckoo.</i>",
 	"<i>Cuckoo. Cuckoo. Cuckoo.</i>"),
 
@@ -692,6 +701,10 @@ grotto and passing under interlacing yews stands over Bloom."),
     diff(
 	"a Scottish widow’s insurance policy",
 	"a Scottish widows’ insurance policy"),
+
+    diff(
+        "Dreams goes by contraries.",
+        "Dreams go by contraries."),
 
     diff(
 	"<i>(He cries.) Pater!</i> Free!",
