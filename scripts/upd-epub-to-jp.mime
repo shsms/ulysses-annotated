@@ -167,8 +167,8 @@ nous, Irlande, vous savez? Ah, oui!</i>"),
 	"three, four : right"),
 
     diff(
-	"Eccles’ Lane",
-	"Eccles lane"),
+	"cuddling her in Eccles’ Lane",
+	"cuddled her in Eccles lane"),
 
     diff(
 	"Citron still in Saint",
@@ -713,6 +713,10 @@ grotto and passing under interlacing yews stands over Bloom."),
     diff(
 	"Yet I’ve a sort of a",
 	"Yet I’ve a sort a"),
+
+   diff(
+       "of</i> Sweets of Sin,",
+       "of Sweets of Sin,"),
 
     diff(
         "Struggle for
