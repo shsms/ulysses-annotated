@@ -232,8 +232,8 @@ def fix_wrocks(b) {
     b.replace("* \n**", "<hr />");
     b.start_of_buffer();
     b.replace(
-        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.<a>",
-        "href=\"notes/100024goldsmith.htm\">Almidano Artifoni walked past Holles street, past Sewell’s yard.</a>",
+        "past Holles street, past Sewell’s yard.<a>",
+        "past Holles street, past Sewell’s yard.</a>",
         1
     );
 }
@@ -251,7 +251,10 @@ def fix_nausicaa(b) {
 }
 
 def fix_oxen(b) {
-    b.replace("printed and bound at the <a", "printed and bound at the</a> <a", 1)
+    // b.replace("printed and bound at the <a", "printed and bound at the</a> <a", 1)
+    b.replace(">Bonafides.
+Where you slep las nigh? <a", ">Bonafides.
+Where you slep las nigh?</a> <a", 1)
 }
 
 def fix_eumaeus(b) {

@@ -436,8 +436,25 @@ what they call a dirty jew."
 
     // scylla
     diff(
+        "<i>First he tickled her
+     Then he patted her
+     Then he passed the female catheter
+     For he was a medical
+     Jolly old medi...</i>",
+        "<i>First he tickled her
+     Then he patted her
+     Then he passed the female catheter.
+     For he was a medical
+     Jolly old medi...</i>"),
+
+    diff(
 	"<i>Homestead.</i>",
 	"<i>Homestead</i>."),
+
+    diff(
+        "<i>L’art d’être grand</i>",
+        "<i>L’art d’&ecirc;tre grand</i>"
+    ),
 
     diff(
 	"<i>Amplius. Adhuc. Iterum. Postea.</i>",
@@ -499,6 +516,11 @@ Invece, Lei si sacrifica.</i>"
     diff(
 	"<i>My girl’s a Yorkshire girl.</i>",
 	"<i>My girl’s a Yorkshire girl</i>."),
+
+    diff(
+        "Northumberland and Lansdowne roads",
+        "Northumberland and Landsdowne roads"
+    ),
 
     // sirens
     diff(
@@ -626,8 +648,19 @@ Suppose she does."
 	"<i>Uebermensch</i>"),
 
     diff(
+        "We are nae fou. We’re nae tha fou.",
+        "We are nae fou.
+We’re nae the fou."
+    ),
+
+    diff(
 	"O lust our refuge and our strength.",
 	"O,\nlust, our refuge and our strength."),
+
+    diff(
+        "Time, gents! Who wander through the world. Health all!",
+        "Time. Who wander through the world. Health all!"
+    ),
 
     // circe
     diff(
