@@ -169,13 +169,23 @@ def fix_basics(b) {
     b.goto_pos(main_pos); b.replace("</i>\n<i>", "\n");
     b.goto_pos(main_pos); b.replace("</i> \n<i>", "\n");
     b.goto_pos(main_pos); b.replace("&nbsp;",    "");
+    b.goto_pos(main_pos); b.replace("&#8212;",   "&mdash;");
+    b.goto_pos(main_pos); b.replace("&ntilde;",  "ñ");
+    b.goto_pos(main_pos); b.replace("&dagger;",  "†");
+
+    b.goto_pos(main_pos); b.replace("&agrave;",  "à");
+    b.goto_pos(main_pos); b.replace("&aacute;",  "á");
+
+    b.goto_pos(main_pos); b.replace("&ecirc;",  "ê");
     b.goto_pos(main_pos); b.replace("&eacute;",  "é");
     b.goto_pos(main_pos); b.replace("&Eacute;",  "É");
-    b.goto_pos(main_pos); b.replace("&agrave;",  "à");
     b.goto_pos(main_pos); b.replace("&egrave;",  "è");
+
+    b.goto_pos(main_pos); b.replace("&oelig;",  "œ");
+
     b.goto_pos(main_pos); b.replace("&ugrave;",  "ù");
     b.goto_pos(main_pos); b.replace("&uuml;",    "ü");
-    b.goto_pos(main_pos); b.replace("&#8212;",   "&mdash;");
+
 
     b.goto_pos(main_pos);
     while(b.find("<span class=\"page\" ") >= 0) {

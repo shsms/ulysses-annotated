@@ -82,14 +82,15 @@ var items = [
 	"I am the servant of two masters"),
 
     diff(
+        "<i>et unam sanctam catholicam et apostolicam ecclesiam:</i>",
+        "<i>et unam sanctam catholicam et apostolicam ecclesiam</i>:"),
+
+
+    diff(
 	"Übermensch.",
 	"Uebermensch."),
 
     // nestor
-    diff(
-        "the library of Saint Genevieve",
-        "the library of Sainte Geneviève"),
-
     diff(
 	"tartan fillibegs",
 	"tartan filibegs"),
@@ -336,6 +337,11 @@ with pomp of tone."
     ),
 
     diff(
+        "Face glistering tallow under her fustian shawl.",
+        "Face glistening tallow under her fustian shawl."
+    ),
+
+    diff(
 	"threepenny bits and sixpences",
 	"threepenny bits and a sixpence"),
 
@@ -344,10 +350,19 @@ with pomp of tone."
         "deus nobis haec otia fecit."
     ),
 
+    diff(
+        "<i>The Parable of The Plums.</i>",
+        "<i>The Parable of the Plums</i>."),
+
     // lestry
     diff(
 	"£. s. d.",
 	"L.s.d."),
+
+    diff(
+        "A procession of whitesmocked sandwichmen",
+        "A procession of whitesmocked men"
+    ),
 
     diff(
 	"U. p: up",
@@ -452,8 +467,8 @@ what they call a dirty jew."
 	"<i>Homestead</i>."),
 
     diff(
-        "<i>L’art d’être grand</i>",
-        "<i>L’art d’&ecirc;tre grand</i>"
+        "<i>Punkt.</i>",
+        "<i>Punkt</i>"
     ),
 
     diff(
@@ -593,6 +608,11 @@ Invece, Lei si sacrifica.</i>"
     ),
 
     diff(
+        "Goosepond Prhklstr Kratchinabritchisitch, Borus Hupinkoff,",
+        "Goosepond Přhklštř Kratchinabritchisitch, Boris Hupinkoff,"
+    ),
+
+    diff(
         "a straw</i>.",
         "a straw.</i>"),
 
@@ -642,6 +662,41 @@ Suppose she does."
     diff(
 	"from waters of old Nile",
 	"from water of old Nile"),
+
+    diff(
+        "Forward to the ribbon counter.",
+        "Forward the ribbon counter."
+    ),
+
+    diff(
+        "Allee samee dis bunch.",
+        "Allee samee this bunch."
+    ),
+
+    diff(
+        "<i>Retamplatan digidi boumboum</i>",
+        "<i>Retamplan Digidi Boum Boum</i>"
+    ),
+
+    diff(
+        "Tramp, tramp, tramp, the boys are (attitudes!) parching.",
+        "Tramp, tramp, tramp, the boys are (atitudes!) parching."
+    ),
+
+    diff(
+        "Beer, beef, business, bibles, bulldogs battleships, buggery and bishops.",
+        "Beer, beef, business, bibles, bulldogs, battleships, buggery and bishops."
+    ),
+
+    diff(
+        "Whether on the scaffold high. Beer, beef, trample the bibles. When for Irelandear. Trample the trampellers.",
+        "Whether on the scaffold high. Beerbeef trample the bibles. When for Irelandear. Trample the trampellers."
+    ),
+
+    diff(
+        "Bishops boosebox.",
+        "Bishops’ boosebox."
+    ),
 
     diff(
 	"<i>Übermensch.</i>",
@@ -747,9 +802,19 @@ grotto and passing under interlacing yews stands over Bloom."),
 	"Yet I’ve a sort of a",
 	"Yet I’ve a sort a"),
 
+    diff(
+        "with outstretched finger.",
+        "with outstretched fingers."
+    ),
+
    diff(
        "of</i> Sweets of Sin,",
        "of Sweets of Sin,"),
+
+    diff(
+        "Moses Herzog, Michael E Geraghty",
+        "Moses Herzog, Michael E. Geraghty"
+    ),
 
     diff(
         "Struggle for
@@ -766,9 +831,12 @@ tsar and the king of England, have invented arbitration."
 
     // eumaeus
     diff(
-        "Bow to the
-      inevitable. Grin and bear it. I remain with much love your brokenhearted
-      husband W. B. Murphy.",
+        "tone of voice <i>à propos</i> of",
+        "tone of voice <i>apropos</i> of"
+    ),
+
+    diff(
+        "Bow to the inevitable. Grin and bear it. I remain with much love your brokenhearted husband W. B. Murphy.",
         "Bow to the inevitable. Grin and bear it. I remain with much love your brokenhearted husband D. B. Murphy."
     ),
 
@@ -882,7 +950,17 @@ II</i>."
 	"ship of the street was manœuvring",
 	"ship of the street was manoeuvring"),
 
+    diff(
+        "their <i>tête à tête</i> (which, of course, he was utterly out of)",
+        "their <i>tête-à-tête</i> (which of course he was utterly out of)"
+    ),
+
     // ithaca
+    diff(
+        "as far as the farther corner of Temple street: then,",
+        "as far as the farther corner of Temple street, north: then,"
+    ),
+
     diff(
 	"Freeman’s Journal</i> and <i>National Press",
     "</i> <i>Freeman’s Journal and
@@ -920,6 +998,11 @@ of the 3 letters in reversed alphabetic boustrophedonic punctated
 quadrilinear cryptogram (vowels suppressed) N. IGS. /WI. UU. OX/W. OKS.
 MH/Y. IM"
 	),
+
+    diff(
+        "Coventry House, South Place, London E C",
+        "Coventry House, South Place, London E. C."
+    ),
 
     diff(
 	"an endowment assurance policy of £ 500",
