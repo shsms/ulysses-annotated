@@ -11,7 +11,7 @@ ebookmaker \
 	--title Ulysses \
 	--author "James Joyce" \
 	--output-file /datadir/ulysses-annotated.epub \
-	--cover ../cover.jpg \
+	--cover ../cover-monochrome.jpg \
 	annotated.htm
 
 ebookmaker \
