@@ -6,6 +6,11 @@ covers:
   image_path: cover.jpg
   rights: Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
   rights_url: https://creativecommons.org/licenses/by-nc/4.0/
+- attribution: adapted from "cover.jpg" by nick fairbank - f9 design, used under CC BY-NC 4.0. by dakota hawkins, 2025.
+  cover_type: monochrome
+  image_path: cover-monochrome.jpg
+  rights: Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+  rights_url: https://creativecommons.org/licenses/by-nc/4.0/
 creator:
   author:
     agent_name: Joyce, James
