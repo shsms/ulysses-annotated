@@ -431,10 +431,11 @@ def insert_footnote(filename, note_id, note_ref_id, epub, notes_index) {
 	extended_note_found = false;
     }
 
+    epub.paste(pagebreak);
     if (!extended_note_found) {
 	epub.paste("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">"+
 		   note +
-		   "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n");
+		   "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n");
 	return true;
     }
     note_b.rfind("</div>");
@@ -460,7 +461,7 @@ def insert_footnote(filename, note_id, note_ref_id, epub, notes_index) {
     epub.paste("<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" + note_ref_id + "\">"+
 	       note + "<br/><u><em>Read more</em></u>" +
 	       extended_note +
-	       "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div><hr/>\n");
+	       "Back to <a href=\"#jpref" + note_ref_id +"\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n");
 
     return true;
 }
