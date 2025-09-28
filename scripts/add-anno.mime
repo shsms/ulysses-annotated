@@ -97,7 +97,7 @@ def parse_colours() {
 	    b.set_mark();
 	    b.goto_pos(b.find("'"));
 	    var colour = to_string(b.copy());
-	    
+
 	    colours[note_name] = colour;
 //	    print("'" + note_name + "' -> '" + colour + "'");
 	    exp_items += 1;
@@ -175,6 +175,7 @@ def fix_basics(b) {
 
     b.goto_pos(main_pos); b.replace("&agrave;",  "à");
     b.goto_pos(main_pos); b.replace("&aacute;",  "á");
+    b.goto_pos(main_pos); b.replace("ā",    "&#257;");
 
     b.goto_pos(main_pos); b.replace("&ecirc;",  "ê");
     b.goto_pos(main_pos); b.replace("&eacute;",  "é");
@@ -289,7 +290,7 @@ def fix_mismatches(b, chapter) {
     fix_basics(b);
     b.start_of_buffer();
     var ch_num = to_string(chapter+1);
-    if(ch_num == "3" || ch_num == "10" || ch_num == "16") {
+    if(ch_num == "3" || ch_num == "10" || ch_num == "12" || ch_num == "16") {
 	b.replace("["+ch_num+"]", "[ "+ch_num+" ]", 1);
     } else {
 	b.replace("<font size=\"+2\">["+ch_num+"]</font>", "[ "+ch_num+" ]", 1);

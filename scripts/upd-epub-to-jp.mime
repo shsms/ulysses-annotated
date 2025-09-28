@@ -540,12 +540,23 @@ Invece, Lei si sacrifica.</i>"
     // sirens
     diff(
 	"All gone. All fallen.",
-	"Naminedamine. All gone. All fallen."),
+	"Naminedamine. All gone. All fallen."
+    ),
+
+    diff(
+        "<i>eau de Nil.</i>",
+        "<i>eau de Nil</i>."
+    ),
 
     diff(
         "Imperthnthn thnthnthn, bootssnout sniffed rudely",
         "Imperthnthn thnthnthn, bootsnout sniffed rudely"
     ),
+
+   diff(
+       "Prosper Loré",
+       "Prosper Lore"
+   ),
 
     diff(
 	"to greaseabloom.",
@@ -556,12 +567,25 @@ Invece, Lei si sacrifica.</i>"
         "the door of the diningroom"),
 
     diff(
+        "Does that to all.
+    </p>
+    <p>
+      For men.",
+        "Does that to all. For men."
+    ),
+
+    diff(
 	"<i>to Flora’s lips",
 	"<i>Flora’s lips"),
 
     diff(
 	"Independent,</i>",
 	"Independent</i>,"),
+
+    diff(
+        "Tenderness it welled: slow, swelling, full it throbbed.",
+        "Tenderness it welled: slow, swelling. Full it throbbed."
+    ),
 
     diff(
 	"Flood of warm jamjam",
@@ -599,12 +623,22 @@ Invece, Lei si sacrifica.</i>"
 
     // cyclops
     diff(
+        "smooth sleek Leinster and of Cruachan",
+        "smooth sleek Leinster and of Cruahan"
+    ),
+
+    diff(
         "with U. p: up on it",
         "with u. p.: up on it"),
 
     diff(
         "<i>&mdash;Bi i dho husht,</i>",
         "&mdash;<i>Bi i dho husht,</i>"
+    ),
+
+    diff(
+        "the young chief of the O’Bergan’s",
+        "the young chief of the O’Bergans"
     ),
 
     diff(
@@ -662,6 +696,11 @@ Suppose she does."
     diff(
 	"from waters of old Nile",
 	"from water of old Nile"),
+
+    diff(
+        "sustained on currents of the cold interstellar wind",
+        "sustained on currents of cold interstellar wind"
+    ),
 
     diff(
         "Forward to the ribbon counter.",
@@ -959,6 +998,15 @@ II</i>."
     diff(
         "as far as the farther corner of Temple street: then,",
         "as far as the farther corner of Temple street, north: then,"
+    ),
+
+    diff(
+        "a man regulating a gasflame of 14 CP, a man lighting a
+      candle of 1 CP, a man removing in turn each of his two boots, a man
+      leaving the kitchen holding a candle.",
+        "a man regulating a gasflame of 14 CP, a man lighting a
+candle, a man removing in turn each of his two boots, a man
+leaving the kitchen holding a candle of 1 CP."
     ),
 
     diff(
