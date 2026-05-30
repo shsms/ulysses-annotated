@@ -161,70 +161,12 @@ def fix_basics(b) {
     }
 }
 
-def fix_telem(b) {
-     b.replace("bowl of bitter waters.", "bowl of bitter waters.</a>", 1);
-}
 
-def fix_proteus(b) {
-    b.replace("href=\"notes/030022chaussons.htm\">vous savez ah, oui!</i></a>",
-	      "href=\"notes/030022chaussons.htm\"><i>vous savez ah, oui!</i></a>", 1);
-}
 
-def fix_lotus(b) {
-    b.replace("<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
-hoardings. <a ",
-              "<a id=\"050061hoardings1\" class=\"box-images\" href=\"notes/050061hoardings.htm\">the multicoloured
-hoardings.</a> <a "
-             )
-}
 
-def fix_aeolus(b) {
-    b.replace("href=\"notes/040103drouth.htm\">drouth. <a ", "href=\"notes/040103drouth.htm\">drouth.</a> <a ", 1);
-    b.replace(
-        "<i>...............latuapace 
- ............che parlar ti piace
-....mentreche il vento, come fa, si tace.</i>",
-        "<i>........................ la tua pace
-    .................. che parlar ti piace
-    Mentre che il vento, come fa, si tace.</i>",
-        1);
-}
 
-def fix_lestry(b) {
-    b.replace(
-        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
-the way it curves there.
-</p>",
-        "href=\"notes/080037nicewood.htm\">Nice quiet bar. Nice piece of wood in that counter. Nicely planed. Like
-the way it curves there.</a></p>",
-        1
-    );
-}
 
-def fix_wrocks(b) {
-    // Each Wandering Rocks section break is two asterisk <a> links ("*" then
-    // "* *", joined by <br/>), both pointing at that section's "New space-time"
-    // note.  Collapse each pair into a single "* * *" link so it matches the
-    // "* * *" that add_notes substitutes for the base's <hr /> at the break.
-    b.replace("*</a><br/><a href=\"notes/Zk-bJZUBeQi-aLQfe7F3.htm\" data-color=\"9C632A\">", "* ");
-    b.replace("*</a><br/><a href=\"notes/kE-bJZUBeQi-aLQff7Jj.htm\" data-color=\"9C632A\">", "* ");
-    b.replace("*</a><br/><a href=\"notes/_U-bJZUBeQi-aLQfd6-b.htm\" data-color=\"9C632A\">", "* ");
-    b.replace("*</a><br/><a href=\"notes/o0-bJZUBeQi-aLQfd66b.htm\" data-color=\"9C632A\">", "* ");
-    b.start_of_buffer();
-    b.replace(
-        "past Holles street, past Sewell’s yard.<a>",
-        "past Holles street, past Sewell’s yard.</a>",
-        1
-    );
-}
 
-def fix_sirens(b) {
-    b.replace(
-        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.\n</p>",
-        "href=\"notes/100012evildays.htm\">&mdash;True men like you men.</a></p>",
-        1
-    )
-}
 
 def fix_cyclops(b) {
     // The API splits a word across two adjacent same-note links ("...g" +
@@ -235,19 +177,8 @@ def fix_cyclops(b) {
     b.replace("a lusty t</a><a href=\"notes/LH_wVp4BqcWimr1oKTys.htm\" data-color=\"F59627\">rencherman", "a lusty trencherman");
 }
 
-def fix_nausicaa(b) {
-    b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
-}
 
-def fix_oxen(b) {
-    b.replace(">Bonafides.
-Where you slep las nigh? <a", ">Bonafides.
-Where you slep las nigh?</a> <a", 1)
-}
 
-def fix_eumaeus(b) {
-    b.replace("&deg 9", "&deg; 9", 1)
-}
 
 def fix_ithaca(b) {
     // The Ithaca prayer is two same-note links split by a <br/> (and with the
@@ -256,19 +187,8 @@ def fix_ithaca(b) {
     // single note marker.
     b.replace("<a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\"><i>Liliata rutilantium. Turma circumdet.</i> </a><i><a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\">Iubilantium te virginum. Chorus excipiat.</a></i>",
 	      "<a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\"><i>Liliata rutilantium. Turma circumdet. Iubilantium te virginum. Chorus excipiat.</i></a>");
-    b.replace(
-        "href=\"notes/050084conversion.htm\">he had divulged his
-disbelief in the tenets of <a",
-        "href=\"notes/050084conversion.htm\">he had divulged his
-disbelief in the tenets of</a> <a",
-        1
-    );
 }
 
-def fix_penelope(b) {
-    b.replace("enteric fever<a id=\"010058bloodyswindle10\" class=\"box-images\" href=\"notes/010058bloodyswindle.htm\"> he", "enteric fever he", 1);
-    b.replace("evening we kissed goodbye <a", "evening we kissed goodbye</a> <a", 1);
-}
 
 def fix_mismatches(b, chapter) {
     fix_basics(b);
@@ -276,19 +196,8 @@ def fix_mismatches(b, chapter) {
     var ch_num = to_string(chapter+1);
     b.replace("<font size=\"+2\">["+ch_num+"]</font>", "[ "+ch_num+" ]", 1);
     switch(chapter) {
-    case (0)  {fix_telem(b);	break;}
-    case (2)  {fix_proteus(b);	break;}
-    case (4)  {fix_lotus(b);	break;}
-    case (6)  {fix_aeolus(b);	break;}
-    case (7)  {fix_lestry(b);	break;}
-    case (9)  {fix_wrocks(b);	break;}
-    case (10) {fix_sirens(b);	break;}
     case (11) {fix_cyclops(b);	break;}
-    case (12) {fix_nausicaa(b); break;}
-    case (13) {fix_oxen(b);	break;}
-    case (15) {fix_eumaeus(b);  break;}
     case (16) {fix_ithaca(b);	break;}
-    case (17) {fix_penelope(b); break;}
     }
     join_repeated_links(b, "</a> <a", " ");
     join_repeated_links(b, "</a><a", " ");
