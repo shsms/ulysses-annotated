@@ -228,6 +228,15 @@ def fix_sirens(b) {
     )
 }
 
+def fix_cyclops(b) {
+    // The API splits a word across two adjacent same-note links ("...g" +
+    // "ood den", "...t" + "rencherman").  Rejoin each into one correctly
+    // spelled link so it matches the base.  The reader sees the base text,
+    // so this only changes what we search for, not what is displayed.
+    b.replace("Give you g</a><a href=\"notes/LH_wVp4BqcWimr1oKTys.htm\" data-color=\"F59627\">ood den", "Give you good den");
+    b.replace("a lusty t</a><a href=\"notes/LH_wVp4BqcWimr1oKTys.htm\" data-color=\"F59627\">rencherman", "a lusty trencherman");
+}
+
 def fix_nausicaa(b) {
     b.replace("<i>Leah,</i></a> <i>Lily of Killarney.</i>", "<i>Leah, Lily of Killarney.</i></a>", 1)
 }
@@ -270,6 +279,7 @@ def fix_mismatches(b, chapter) {
     case (7)  {fix_lestry(b);	break;}
     case (9)  {fix_wrocks(b);	break;}
     case (10) {fix_sirens(b);	break;}
+    case (11) {fix_cyclops(b);	break;}
     case (12) {fix_nausicaa(b); break;}
     case (13) {fix_oxen(b);	break;}
     case (15) {fix_eumaeus(b);  break;}
