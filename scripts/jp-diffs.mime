@@ -505,11 +505,6 @@ Invece, Lei si sacrifica.</i>"
     ),
 
     diff(
-        "<i>eau de Nil.</i>",
-        "<i>eau de Nil</i>."
-    ),
-
-    diff(
         "Imperthnthn thnthnthn, bootssnout sniffed rudely",
         "Imperthnthn thnthnthn, bootsnout sniffed rudely"
     ),
