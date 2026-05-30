@@ -163,8 +163,6 @@ def fix_basics(b) {
 
 def fix_telem(b) {
      b.replace("bowl of bitter waters.", "bowl of bitter waters.</a>", 1);
-     b.replace("et unam sanctam catholicam</i></a><a id=\"010115creed1\" class=\"box-images\" href=\"notes/010115creed.htm\"><i> et apostolicam\necclesiam</i></a>:",
-  	      "et unam sanctam catholicam et apostolicam ecclesiam:</i></a>", 1);
 }
 
 def fix_proteus(b) {
@@ -252,6 +250,12 @@ def fix_eumaeus(b) {
 }
 
 def fix_ithaca(b) {
+    // The Ithaca prayer is two same-note links split by a <br/> (and with the
+    // second <i> outside its <a>), so they never auto-join. Merge them into
+    // one link, matching the base (which keeps the prayer as one <pre> span), so the whole prayer takes a
+    // single note marker.
+    b.replace("<a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\"><i>Liliata rutilantium. Turma circumdet.</i> </a><i><a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\">Iubilantium te virginum. Chorus excipiat.</a></i>",
+	      "<a href=\"notes/bE-bJZUBeQi-aLQfd7Cb.htm\" data-color=\"AB59C2\"><i>Liliata rutilantium. Turma circumdet. Iubilantium te virginum. Chorus excipiat.</i></a>");
     b.replace(
         "href=\"notes/050084conversion.htm\">he had divulged his
 disbelief in the tenets of <a",

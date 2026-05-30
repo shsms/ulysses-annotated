@@ -47,8 +47,8 @@ var items = [
 	"I am the servant of two masters"),
 
     diff(
-        "<i>et unam sanctam catholicam et apostolicam ecclesiam:</i>",
-        "<i>et unam sanctam catholicam et apostolicam ecclesiam</i>:"),
+        "et apostolicam ecclesiam:</i>",
+        "</i><i> et apostolicam ecclesiam</i>:"),
 
 
     diff(
