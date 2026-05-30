@@ -11,6 +11,10 @@ class diff {
 var items = [
     // telem
     diff(
+        "Kinch, the knife-blade",
+        "Kinch, the knifeblade"),
+
+    diff(
 	"his grey searching eyes",
 	"his great searching eyes"),
 
@@ -110,6 +114,10 @@ a widowed see, with upstiffed omophorion"),
       Irlande, vous savez ah, oui!</i>",
         "<i>Il est irlandais. Hollandais? Non fromage. Deux irlandais,
 nous, Irlande, vous savez? Ah, oui!</i>"),
+
+    diff(
+        "<i>The boys of Kilkenny are stout roaring blades</i>",
+        "<i>The boys of Kilkenny are</i> stout roaring blades"),
 
     diff(
 	" ensablé</i> Louis",
@@ -257,6 +265,10 @@ eyes, secretsearching eyes. Mason, I think: not sure."),
 	"<i>Weekly Freeman</i><i>\nand National Press</i>"),
 
     diff(
+        "<i>Co-ome thou lost one, Co-ome",
+        "<i>Co-ome thou lost one,</i> Co-ome"),
+
+    diff(
         "mangiD kcirtaP.",
         "mangiD. kcirtaP."
     ),
@@ -280,6 +292,12 @@ with pomp of tone."
         "Tay Pay who took him on to the <i>Star.</i>",
         "Tay Pay who took him on to the <i>Star</i>."
     ),
+
+    diff(
+        "<i>........................ la tua pace .................. che parlar ti piace Mentre che il vento, come fa, si tace.</i>",
+        "<i>. . . . . . . . . . . . . . . la tua pace
+    . . . . . . . . . . . . che parlar ti piace
+    . . . .mentreche il vento, come fa, si tace.</i>"),
 
     diff(
         "oriafiamma</i>, gold of oriflamme, <i>di rimirar fè più ardenti.</i>",
@@ -307,6 +325,10 @@ with pomp of tone."
 	"threepenny bits and a sixpence"),
 
     diff(
+        "<h3>K.M.A.</h3>",
+        "<h3>K. M. A.</h3>"),
+
+    diff(
         "deus nobis hæc otia fecit.",
         "deus nobis haec otia fecit."
     ),
@@ -321,6 +343,10 @@ with pomp of tone."
 	"L.s.d."),
 
     diff(
+        "two windows of the ballastoffice",
+        "two windows of the ballast office"),
+
+    diff(
         "A procession of whitesmocked sandwichmen",
         "A procession of whitesmocked men"
     ),
@@ -332,6 +358,10 @@ with pomp of tone."
     diff(
 	"Express.</i>",
 	"Express</i>."),
+
+    diff(
+        "Luncheon interval. A sixpenny",
+        "Luncheon interval a sixpenny"),
 
     diff(
         "Peaceful eyes. Weight off their mind.",
@@ -428,6 +458,10 @@ what they call a dirty jew."
 	"<i>Homestead</i>."),
 
     diff(
+        "For years in this fleshcase a shesoul dwelt.</i>",
+        "<i>For years in this fleshcase a shesoul dwelt.</i>"),
+
+    diff(
         "<i>Punkt.</i>",
         "<i>Punkt</i>"
     ),
@@ -455,6 +489,14 @@ tram."
     ),
 
     diff(
+        "vas naturale mulieris,</i>",
+        "vas naturale mulieris</i>"),
+
+    diff(
+        "in eternum omnia iudicia",
+        "in eternum omnia indicia"),
+
+    diff(
         "<i>&mdash;Ma!</i> Almidano Artifoni said.",
         "&mdash;<i>Ma!</i> Almidano Artifoni said."
     ),
@@ -464,7 +506,7 @@ tram."
       ero giovine come Lei. Eppoi mi sono convinto che il mondo è una bestia. È
       peccato. Perchè la sua voce... sarebbe un cespite di rendita, via. Invece,
       Lei si sacrifica.</i>",
-        "&mdash;<i>Anch’io ho avuto di queste idee,</i> Almidano Artifoni said <i>quand’ ero
+        "&mdash;<i>Anch’io ho avuto di queste idee</i> Almidano Artifoni said <i>quand’ ero
 giovine come Lei. Eppoi mi sono convinto che il mondo è una bestia.
 È peccato. Perchè la sua voce... sarebbe un cespite di rendita, via.
 Invece, Lei si sacrifica.</i>"
@@ -584,6 +626,10 @@ Invece, Lei si sacrifica.</i>"
     ),
 
     diff(
+        "the agate with this dun",
+        "the agate with the dun"),
+
+    diff(
         "with U. p: up on it",
         "with u. p.: up on it"),
 
@@ -607,6 +653,18 @@ Invece, Lei si sacrifica.</i>"
         "a straw.</i>"),
 
     diff(
+        "O’Molloy’s, a comely",
+        "O’Molloys, a comely"),
+
+    diff(
+        "&mdash;Of course an action would lie, says J. J. It implies that he is not <i>compos mentis</i>. U. p: up.",
+        "&mdash; Of course an action would lie, says J. J. It implies that he is not <i>compos mentis</i>. U. p. up."),
+
+    diff(
+        "your eye! says Alf",
+        "your eye? says Alf"),
+
+    diff(
         "Ay, says Alf. Reuben J was bloody lucky",
         "Ay, says Alf. Reuben J. was bloody lucky"
     ),
@@ -620,12 +678,20 @@ Invece, Lei si sacrifica.</i>"
     ),
 
     diff(
+        "Louis J Walsh, Magherafelt",
+        "Louis J. Walsh, Magherafelt"),
+
+    diff(
 	"Featherbed mountain.",
 	"the featherbed mountain."),
 
     diff(
 	"the Gold Cup races!",
 	"the Gold Cup race!"),
+
+    diff(
+        "<i>Leah, Lily of Killarney.</i>",
+        "<i>Leah,</i> Lily of Killarney."),
 
     diff(
         "Dreamt last night?
@@ -695,7 +761,7 @@ Suppose she does."
 
     diff(
 	"<i>Übermensch.</i>",
-	"<i>Uebermensch</i>"),
+	"<i>Uebermensch</i>."),
 
     diff(
         "We are nae fou. We’re nae tha fou.",
@@ -768,9 +834,9 @@ bagslops."
 
     diff(
 	"teabrown artcolours, descends from her grotto and
-      passing under interlacing yews stands over Bloom.",
+      passing under interlacing yews stands over Bloom.)</i>",
 	"</i> <i>teabrown artcolours</i>, <i>descends from her
-grotto and passing under interlacing yews stands over Bloom."),
+grotto and passing under interlacing yews stands over Bloom.</i>)"),
 
     diff(
 	"lights the</i> Erin’s King <i>sails",
@@ -780,6 +846,10 @@ grotto and passing under interlacing yews stands over Bloom."),
         "She clutches again in her robe.",
         "She clutches in her robe."
     ),
+
+    diff(
+        "(Sated, smiles.)",
+        "(Seated, smiles.)"),
 
     diff(
 	"a Scottish widow’s insurance policy",
@@ -834,6 +904,10 @@ tsar and the king of England, have invented arbitration."
         "Bow to the inevitable. Grin and bear it. I remain with much love your brokenhearted husband W. B. Murphy.",
         "Bow to the inevitable. Grin and bear it. I remain with much love your brokenhearted husband D. B. Murphy."
     ),
+
+    diff(
+        "there was a steamtram",
+        "there was a steam tram"),
 
     diff(
 	"simply letting spirt a jet of spew",
@@ -903,7 +977,7 @@ odds."
 
     diff(
 	"no 9 Newbridge Avenue",
-	"n&deg; 9 Newbridge Avenue"),
+	"n° 9 Newbridge Avenue"),
 
     diff(
         "Cornelius T. Kelleher, Joseph M’C Hynes, L. Boom, C P
@@ -990,6 +1064,10 @@ lacerated unguical fragment"
 	"postage stamps (7 shilling, mauve"),
 
     diff(
+        "from Mr + Mrs M. Comerford",
+        "from Mr and Mrs M. Comerford"),
+
+    diff(
 	"c/o. P. O. Dolphin",
 	"c/o P. O.\nDolphin"),
 
@@ -1010,7 +1088,7 @@ MH/Y. IM"
 
     diff(
 	"an endowment assurance policy of £ 500",
-	"an endowment assurance policy of &pound;500"),
+	"an endowment assurance policy of £500"),
 
     diff(
 	"An ancient haggadah book",
@@ -1023,7 +1101,7 @@ MH/Y. IM"
     // penelope
     diff(
 	"for £ 10000 for a postcard U p up",
-	"for &pound;10000 for a postcard up up"),
+	"for £10000 for a postcard up up"),
 
     diff(
 	"coming man Griffiths is",
