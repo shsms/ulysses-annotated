@@ -129,9 +129,14 @@ func (d *downloader) run(outDir string) error {
 	}
 
 	// Then fetch and reshape each distinct note.
-	fmt.Printf("fetching %d distinct notes...\n", len(noteIDs))
-	var missing, failed int
+	total := len(noteIDs)
+	fmt.Printf("fetching %d distinct notes...\n", total)
+	var missing, failed, done int
 	for id := range noteIDs {
+		done++
+		if done%100 == 0 || done == total {
+			fmt.Printf("notes: %d/%d (%d%%)\n", done, total, done*100/total)
+		}
 		var n document
 		ok, err := d.getJSONOptional("notes/"+id, "note-"+id, &n)
 		if err != nil {
@@ -152,7 +157,7 @@ func (d *downloader) run(outDir string) error {
 		}
 	}
 	fmt.Printf("done: %d chapters, %d notes (%d not found, %d failed)\n",
-		len(chapters), len(noteIDs)-missing-failed, missing, failed)
+		len(chapters), total-missing-failed, missing, failed)
 	return nil
 }
 
