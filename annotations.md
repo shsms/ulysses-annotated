@@ -21,24 +21,16 @@ All these steps below were verified to work on [Manjaro](https://manjaro.org/), 
 
 ### Download files from joyceproject
 
-The provided [go](https://golang.org/) program uses [ideacrawler](https://github.com/shsms/ideacrawler) to download the annotations.  To run,
+The provided [go](https://golang.org/) program downloads the annotations from the Joyce Project's JSON API.  To run,
 
 - install a recent go compiler from https://golang.org
 
-- start the ideacrawler server:
-
-		git clone https://github.com/shsms/ideacrawler
-		cd ideacrawler
-		make build
-		build/ideacrawler
-
-- run the download client in a second terminal:
+- run the downloader:
 
 		cd ulysses-annotated/scripts
-		go get github.com/shsms/ideacrawler/goclient
 		make download
 
-This would take some time,  but the files will get downloaded into `ulysses-annotated/scripts/annotations-raw`
+This fetches each chapter and note over the API (sequentially, to stay gentle on the server) into `ulysses-annotated/scripts/annotations-raw`.  Raw API responses are cached under `annotations-raw/.api-cache`,  so reruns don't refetch.
 
 ### Download and build mime
 
