@@ -204,7 +204,14 @@ the way it curves there.</a></p>",
 }
 
 def fix_wrocks(b) {
-    b.replace("* \n**", "<hr />");
+    // Each Wandering Rocks section break is two asterisk <a> links ("*" then
+    // "* *", joined by <br/>), both pointing at that section's "New space-time"
+    // note.  Collapse each pair into a single "* * *" link so it matches the
+    // "* * *" that add_notes substitutes for the base's <hr /> at the break.
+    b.replace("*</a><br/><a href=\"notes/Zk-bJZUBeQi-aLQfe7F3.htm\" data-color=\"9C632A\">", "* ");
+    b.replace("*</a><br/><a href=\"notes/kE-bJZUBeQi-aLQff7Jj.htm\" data-color=\"9C632A\">", "* ");
+    b.replace("*</a><br/><a href=\"notes/_U-bJZUBeQi-aLQfd6-b.htm\" data-color=\"9C632A\">", "* ");
+    b.replace("*</a><br/><a href=\"notes/o0-bJZUBeQi-aLQfd66b.htm\" data-color=\"9C632A\">", "* ");
     b.start_of_buffer();
     b.replace(
         "past Holles street, past Sewell’s yard.<a>",
@@ -608,6 +615,13 @@ def add_notes(epub, main_cur, notes_cur, use_colour, stats) {
 	}
 	epub.narrow_to_region();
 	epub.start_of_buffer();
+
+	if (chapter == 9) {  // Wandering Rocks: render the base's <hr /> section
+	    // breaks as the Joyce Project's "* * *", so each collapsed divider
+	    // annotation (see fix_wrocks) has a "* * *" in the base to attach to.
+	    epub.replace("<hr />", "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>", 100);
+	    epub.start_of_buffer();
+	}
 
 	b.find("class=\"newchapter\"");
 	b.find(">");
