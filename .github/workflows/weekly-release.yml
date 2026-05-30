@@ -26,9 +26,6 @@ jobs:
           sudo apt-get install python3 tidy calibre python3-pip
           sudo -H pip3 install setuptools
           sudo -H pip3 install ebookmaker pytidylib
-      - name: get ideacrawler
-        run: |
-          go install github.com/shsms/ideacrawler@v1.0.1-0.20210103114145-eb05e956ef90
       - name: get mime
         run: |
           curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
@@ -36,10 +33,7 @@ jobs:
           chmod +x mime
       - name: download annotations
         run: |
-          ~/go/bin/ideacrawler &>/dev/null &
-          sleep 1
           make -C scripts download
-          killall ideacrawler
         timeout-minutes: 30
       - name: add annotations
         run: |

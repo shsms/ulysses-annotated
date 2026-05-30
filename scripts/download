@@ -1,7 +1,3 @@
 #!/bin/bash
 
-ideacrawler &>/dev/null &
-
-sleep 1
-
 scripts/dl-anno /datadir/annotations-raw/
