@@ -53,7 +53,6 @@ var slugs = []string{
 var (
 	annoRe   = regexp.MustCompile(`<a\s+href="([^"]+)"\s+data-color="([^"]*)"\s+data-tag="[^"]*"\s+data-type="annotation"\s*>`)
 	markerRe = regexp.MustCompile(`(<a href="notes/[^"]+\.htm" data-color="[^"]*">)\[(\d+)\]</a>`)
-	sigRe    = regexp.MustCompile(`(?:18|19|20)\d{2}\.?$`)
 )
 
 type chapterMeta struct {
@@ -213,8 +212,8 @@ func buildNote(title, src string) string {
 
 // splitNote separates a note body into its "In brief" and "At more length"
 // sections by the labelled paragraphs (matched on text, since newer notes mark
-// them as plain emphasis rather than with the subheader class), dropping the
-// trailing author/year signature.
+// them as plain emphasis rather than with the subheader class).  The trailing
+// author/year signature is kept with the last section as the note's attribution.
 func splitNote(src string) (brief, extended string) {
 	body := &html.Node{Type: html.ElementNode, Data: "body", DataAtom: atom.Body}
 	nodes, err := html.ParseFragment(strings.NewReader(src), body)
@@ -245,18 +244,6 @@ func splitNote(src string) (brief, extended string) {
 			}
 		}
 	}
-	sig := -1
-	for i := len(blocks) - 1; i >= 0; i-- { // the last non-empty block, if it is an author/year signature
-		t := nodeText(blocks[i])
-		if strings.TrimSpace(t) == "" {
-			continue // newer notes have a trailing empty paragraph after the signature
-		}
-		if len(t) <= 40 && sigRe.MatchString(t) && !strings.Contains(t[:max(0, len(t)-5)], ".") {
-			sig = i
-		}
-		break
-	}
-
 	startBrief := 0
 	if inBrief >= 0 {
 		startBrief = inBrief + 1
@@ -264,24 +251,16 @@ func splitNote(src string) (brief, extended string) {
 	endBrief := len(blocks)
 	if atMore >= 0 {
 		endBrief = atMore
-	} else if sig >= 0 {
-		endBrief = sig
 	}
 	brief = render(blocks, startBrief, endBrief)
 	if strings.TrimSpace(stripTags(brief)) == "" { // fallback: keep whole body
-		end := len(blocks)
-		if sig >= 0 {
-			end = sig
-		}
-		brief = render(blocks, 0, end)
+		brief = render(blocks, 0, len(blocks))
 	}
 
 	if atMore >= 0 {
-		endExt := len(blocks)
-		if sig >= 0 {
-			endExt = sig
-		}
-		extended = render(blocks, atMore+1, endExt)
+		// The trailing author/year signature, if present, falls at the end of
+		// this last section and stays in as the note's closing attribution.
+		extended = render(blocks, atMore+1, len(blocks))
 	}
 	return brief, extended
 }
@@ -332,13 +311,6 @@ func escapeText(s string) string {
 	s = strings.ReplaceAll(s, "<", "&lt;")
 	s = strings.ReplaceAll(s, ">", "&gt;")
 	return s
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 // getJSON fetches an API path (cached) and unmarshals it; a 404 is an error.
