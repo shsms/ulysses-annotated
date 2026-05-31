@@ -8,52 +8,67 @@
 ;; normalise to that here (match-beginning + point), so `goto_pos(find(...))'
 ;; ports faithfully. All return nil on a miss.
 (defun find (s)        (and (search-forward  s nil t) (match-beginning)))
+(defun find_re (r)     (and (re-search-forward r nil t) (match-beginning)))  ; mime's find(regex(R))
 (defun find_fuzzy (s)  (and (search-fuzzy    s nil t) (match-beginning)))
 (defun rfind (s)       (and (search-backward s nil t) (point)))
 (defun replace (from to &optional n)
-  "Literal replace of FROM by TO from point; with N non-nil, only the first."
+  "Literal replace of FROM by TO from point; with N, at most N occurrences."
   (if n
-      (when (search-forward from nil t) (replace-match to))
+      (let ((i 0))
+        (while (and (< i n) (search-forward from nil t))
+          (replace-match to)
+          (setq i (1+ i))))
     (replace-string from to)))
+(defun get_contents () (buffer-substring (point-min) (point-max)))  ; mime's get_contents()
 (defun set_mark ()     (set-mark (point)))
 (defun get_pos ()      (point))
 (defun goto_pos (n)    (goto-char n))
-(defun forward (n)     (forward-char n))
+(defun forward (&optional n)  (forward-char (or n 1)))
+(defun backward (&optional n) (forward-char (- (or n 1))))
+(defun next_line ()    (forward-line 1))
 (defun start_of_buffer () (goto-char (point-min)))
 (defun end_of_buffer ()   (goto-char (point-max)))
 (defun paste (s)       (insert s))
 (defun copy ()         (buffer-substring (region-beginning) (region-end)))
 (defun erase_region () (delete-region (region-beginning) (region-end)))
-(defun cut ()          (let ((s (copy))) (erase-region) s))
+(defun cut ()          (let ((s (copy))) (erase_region) s))
 (defun to_string (n)   (number-to-string n))
 
-;; ---- cursors: independent (point + narrowing) states over ONE buffer --------
-;; A cursor is (MARKER . NARROW) where NARROW is nil (widened) or (LO . HI).
-;; `use_cursor' saves the active cursor's point and restores the target's point
-;; and restriction — emulating mime's multiple cursors.
+;; ---- cursors: independent (point + narrowing) states, possibly in different
+;; buffers -------------------------------------------------------------------
+;; A cursor is (MARKER NARROW BUFNAME): a saved point, a restriction (nil =
+;; widened, or (LO . HI)), and the buffer it lives in. `use_cursor' saves the
+;; active cursor and restores the target's buffer, point, and restriction —
+;; emulating mime's multiple cursors.
 (setq *cursor* nil)
 
-(defun new_cursor ()
-  (cons (point-marker) nil))
+(defun new_cursor () (list (point-marker) nil (current-buffer)))
 
 (defun use_cursor (c)
   (when *cursor*
-    (set-marker (car *cursor*) (point))                 ; save where we were
+    ;; Save from the active cursor's OWN buffer: the caller may have set-buffer'd
+    ;; to an unrelated buffer (e.g. a chapter source) while this cursor stayed
+    ;; active, and (point)/(point-min) there would corrupt the saved state.
+    (set-buffer (car (cdr (cdr *cursor*))))
+    (set-marker (car *cursor*) (point))
     ;; a narrowed cursor's bounds may have grown from its own edits; refresh them
     ;; from the live restriction so they are not stale when we come back.
-    (when (cdr *cursor*) (setcdr *cursor* (cons (point-min) (point-max)))))
+    (when (car (cdr *cursor*))
+      (setcar (cdr *cursor*) (cons (point-min) (point-max)))))
   (setq *cursor* c)
+  (set-buffer (car (cdr (cdr c))))                      ; the cursor's buffer
   (widen)
-  (when (cdr c) (narrow-to-region (car (cdr c)) (cdr (cdr c))))
+  (let ((nw (car (cdr c))))
+    (when nw (narrow-to-region (car nw) (cdr nw))))
   (goto-char (marker-position (car c))))
 
 ;; mime's narrow_to_region() narrows to mark..point AND remembers it on the
-;; active cursor (so use_cursor restores it); widen clears it.
+;; active cursor (so use_cursor restores it).
 (defun narrow_to_region ()
   (let ((lo (region-beginning)) (hi (region-end)))
     (narrow-to-region lo hi)
-    (when *cursor* (setcdr *cursor* (cons lo hi)))))
+    (when *cursor* (setcar (cdr *cursor*) (cons lo hi)))))
 
-(defun cur-widen ()
-  (widen)
-  (when *cursor* (setcdr *cursor* nil)))
+;; plain narrow for non-cursor buffers (chapter/note buffers), leaving the
+;; active epub cursor's remembered restriction untouched.
+(defun narrow_here () (narrow-to-region (region-beginning) (region-end)))

@@ -3,6 +3,10 @@
 
 (setq basepath "")
 
+;; Directory holding the templates (preface.htm, firstpage-*.htm); set in main.
+;; Empty means cwd-relative, matching mime's bare buffer("preface.htm").
+(setq templates-path "")
+
 (setq chapters (list
   "/index.php-telem.htm"   "/index.php-nestor.htm"  "/index.php-proteus.htm"
   "/index.php-calypso.htm" "/index.php-lotus.htm"   "/index.php-hades.htm"
