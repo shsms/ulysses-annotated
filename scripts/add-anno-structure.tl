@@ -1,46 +1,53 @@
 ;;; add-anno structure/reorder transforms — ports of the same-named functions in
-;;; add-anno.mime. They edit the CURRENT buffer (mime's buffer param is dropped;
-;;; the caller sets the buffer/cursor). Uses mime-compat (find/cut/paste/…).
+;;; add-anno.mime, editing the CURRENT buffer. The reorders and the anchor fixer
+;;; below have been migrated to plain Emacs primitives; the document-structure
+;;; edits (update_*, *_first_page, insert_preface) still use mime-compat pending
+;;; migration.
 
-(defun lotus_reorder ()
-  (find "saint Peter Claver and the African Mission.")
-  (set_mark)
-  (find "religion.")
-  (let ((passage (cut)))
-    (find "Rank heresy for them. ")
-    (paste passage))
-  (start_of_buffer))
+;; Move a passage between two anchor phrases to just after a third.
+(defun lotus-reorder ()
+  (search-forward "saint Peter Claver and the African Mission.")
+  (let ((start (point)))
+    (search-forward "religion.")
+    (let ((passage (buffer-substring start (point))))
+      (delete-region start (point))
+      (search-forward "Rank heresy for them. ")
+      (insert passage)))
+  (goto-char (point-min)))
 
-(defun aeolus_reorder ()
-  (find "Hell of a racket they make.")
-  (set_mark)
-  (find "Iron nerves.")
-  (let ((passage (cut)))
-    (rfind "He wants it in for July")
-    (find "</p>")
-    (paste (concat "<p>" passage "</p>")))
-  (start_of_buffer))
+(defun aeolus-reorder ()
+  (search-forward "Hell of a racket they make.")
+  (let ((start (point)))
+    (search-forward "Iron nerves.")
+    (let ((passage (buffer-substring start (point))))
+      (delete-region start (point))
+      (search-backward "He wants it in for July")
+      (search-forward "</p>")
+      (insert (concat "<p>" passage "</p>"))))
+  (goto-char (point-min)))
 
-(defun penelope_reorder ()
-  (find "they hide it with a cabbageleaf")
-  (set_mark)
-  (find "kick or a bang of something there")
-  (let ((passage (cut)))
-    (find "go about like that I asked him")
-    (paste passage))
-  (start_of_buffer))
+(defun penelope-reorder ()
+  (search-forward "they hide it with a cabbageleaf")
+  (let ((start (point)))
+    (search-forward "kick or a bang of something there")
+    (let ((passage (buffer-substring start (point))))
+      (delete-region start (point))
+      (search-forward "go about like that I asked him")
+      (insert passage)))
+  (goto-char (point-min)))
 
-(defun fix_chapter_anchors ()
-  ;; move each "<a ...>H2 anchor</a>" inside the following </h2>.
-  (start_of_buffer)
-  (while (find "H2 anchor")
-    (find "</a>")
-    (set_mark)
-    (rfind "<a")
-    (let ((anchor (cut)))
-      (find "</h2>")
-      (paste anchor)))
-  (start_of_buffer))
+;; Move each "<a ...>H2 anchor</a>" inside the following </h2>.
+(defun fix-chapter-anchors ()
+  (goto-char (point-min))
+  (while (search-forward "H2 anchor" nil t)
+    (search-forward "</a>")
+    (let ((end (point)))
+      (search-backward "<a")
+      (let ((anchor (buffer-substring (point) end)))
+        (delete-region (point) end)
+        (search-forward "</h2>")
+        (insert anchor))))
+  (goto-char (point-min)))
 
 ;; ---- document-structure edits (CSS, title page, TOC, preface) ---------------
 
