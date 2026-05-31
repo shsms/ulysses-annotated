@@ -166,7 +166,7 @@
         (paste (concat pagebreak "<h3>[ " (to_string (1+ chapter)) " ]</h3>"))
         (let ((note-num 1))
           (set-buffer b)
-          (fix_mismatches chapter)
+          (fix-mismatches chapter)
           ;; bound the base-text cursor to this chapter's slice [ N ] .. [ N+1 ]
           (use_cursor main-cur)
           (widen)
