@@ -2,10 +2,19 @@
 ;;; helpers, so the ported scripts read like the originals. Trusted tier (some
 ;;; helpers open files). `load` this before the ported script body.
 
-;; ---- search / region / edit (point moves past a forward match, like mime) ----
-(defun find (s)        (search-forward  s nil t))   ; -> end pos, or nil on miss
-(defun rfind (s)       (search-backward s nil t))
-(defun find_fuzzy (s)  (search-fuzzy    s nil t))
+;; ---- search / region / edit -------------------------------------------------
+;; mime's find/find_fuzzy return the match START (often used as a position) and
+;; leave point PAST the match; rfind returns the start with point AT it. We
+;; normalise to that here (match-beginning + point), so `goto_pos(find(...))'
+;; ports faithfully. All return nil on a miss.
+(defun find (s)        (and (search-forward  s nil t) (match-beginning)))
+(defun find_fuzzy (s)  (and (search-fuzzy    s nil t) (match-beginning)))
+(defun rfind (s)       (and (search-backward s nil t) (point)))
+(defun replace (from to &optional n)
+  "Literal replace of FROM by TO from point; with N non-nil, only the first."
+  (if n
+      (when (search-forward from nil t) (replace-match to))
+    (replace-string from to)))
 (defun set_mark ()     (set-mark (point)))
 (defun get_pos ()      (point))
 (defun goto_pos (n)    (goto-char n))
