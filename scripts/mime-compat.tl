@@ -9,8 +9,19 @@
 ;; ports faithfully. All return nil on a miss.
 (defun find (s)        (and (search-forward  s nil t) (match-beginning)))
 (defun find_re (r)     (and (re-search-forward r nil t) (match-beginning)))  ; mime's find(regex(R))
-(defun find_fuzzy (s)  (and (search-fuzzy    s nil t) (match-beginning)))
-(defun rfind (s)       (and (search-backward s nil t) (point)))
+;; mime's rfind RETURNS the match END but leaves POINT at the match start: the
+;; join uses the return value (goto_pos(rfind ...) -> URL start), while
+;; cut/find-after-rfind use point (the match start). search-backward lands at
+;; the start, so return start+(length s) without moving point.
+(defun rfind (s)       (and (search-backward s nil t) (+ (point) (length s))))
+
+;; mime's find_fuzzy compiles the needle to a regex: case-insensitive, leading/
+;; trailing whitespace trimmed, and each internal run of whitespace matching any
+;; run of whitespace. `split-string' (no separator) trims and splits on
+;; whitespace runs; quote each word and rejoin with \s+.
+(defun fuzzy-regex (needle)
+  (concat "(?i)" (mapconcat (lambda (w) (regexp-quote w)) (split-string needle) "\\s+")))
+(defun find_fuzzy (s)  (and (re-search-forward (fuzzy-regex s) nil t) (match-beginning)))
 (defun replace (from to &optional n)
   "Literal replace of FROM by TO from point; with N, at most N occurrences."
   (if n

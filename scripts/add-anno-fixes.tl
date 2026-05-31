@@ -48,7 +48,7 @@
     (goto_pos main-pos) (replace "&#39;"   "’")
     (goto_pos main-pos) (replace "&quot;"  "\"")
     (goto_pos main-pos) (replace "&#34;"   "\"")
-    (goto_pos main-pos) (replace "— "      "&mdash;")
+    (goto_pos main-pos) (replace "— "      "&mdash;")
     (goto_pos main-pos) (replace "—"       "&mdash;")
     (goto_pos main-pos) (replace "–"       "&#8211;")
     (goto_pos main-pos) (replace "'"       "’")
