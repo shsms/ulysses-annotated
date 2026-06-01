@@ -145,7 +145,6 @@
                           (delete-region (match-beginning 0) (match-end 0))))
                       (setq ext-body (buffer-substring (point-min) (point-max))))))
                 (setq result (list has-title title pre post ext-found ext-body))))))
-      (set-buffer *home-buffer*)
       (kill-buffer note-b))
     result))
 
@@ -183,6 +182,46 @@
             (set-marker notes-mark (point))
             t))))))
 
+;; ---- per-chapter annotation links, extracted once and cached -----------------
+;; A chapter's (url colour text) triples (in document order) are identical across
+;; the two builds, so extract them once (read + fix-mismatches + scan the body)
+;; and cache; the second build then never touches the chapter source buffers.
+(setq *chapter-links* (list nil))
+
+(defun extract-chapter-links (chapter)
+  (let ((b (generate-new-buffer "chap")) (links nil))
+    (with-current-buffer b
+      (insert-file-contents (concat basepath (nth chapter chapters)))
+      (goto-char (point-min))
+      (fix-mismatches chapter)
+      ;; narrow the chapter source to its body (drop trailing nav links)
+      (goto-char (point-min))
+      (search-forward "class=\"newchapter\"")
+      (search-forward ">")
+      (let ((body-start (point)))
+        (search-forward "<div id=\"footer\">")
+        (narrow-to-region body-start (point)))
+      (goto-char (point-min))
+      (catch 'done
+        (while t
+          (when (not (search-forward "href=\"" nil t)) (throw 'done nil))
+          (let (url colour text)
+            (let ((s (point))) (search-forward "\"") (setq url (buffer-substring s (match-beginning 0))))
+            (search-forward "data-color=\"")
+            (let ((s (point))) (search-forward "\"") (setq colour (buffer-substring s (match-beginning 0))))
+            (search-forward ">")
+            (let ((s (point))) (search-forward "</a>") (setq text (buffer-substring s (match-beginning 0))))
+            (setq links (cons (list url colour text) links))))))
+    (kill-buffer b)
+    (reverse links)))
+
+(defun chapter-links (chapter)
+  (let ((hit (assoc chapter (car *chapter-links*))))
+    (if hit (cdr hit)
+      (let ((links (extract-chapter-links chapter)))
+        (setcar *chapter-links* (cons (cons chapter links) (car *chapter-links*)))
+        links))))
+
 ;; ---- walk every chapter, attach a footnote per matched annotation ------------
 ;; MAIN-MARK tracks the base-text insert point; NOTES-MARK the Annotations append
 ;; point; both are markers in the epub. The per-chapter base-text slice is bounded
@@ -190,76 +229,52 @@
 (defun add-notes (epub main-mark notes-mark use-colour notes-box stats)
   (let ((total 0) (found 0) (not-found 0) (annotation-failures 0) (chapter 0))
     (while (< chapter 18)
-      (let ((b (generate-new-buffer "chap")))
-        (with-current-buffer b
-          (insert-file-contents (concat basepath (nth chapter chapters)))
-          (goto-char (point-min)))
-        ;; the chapter's "[ N ]" heading into the Annotations section
+      ;; the chapter's "[ N ]" heading into the Annotations section
+      (with-current-buffer epub
+        (goto-char notes-mark)
+        (insert (concat pagebreak "<h3>[ " (number-to-string (1+ chapter)) " ]</h3>"))
+        (set-marker notes-mark (point)))
+      (let ((note-num 1) chap-end)
+        ;; locate this chapter's base-text slice [ N ] .. [ N+1 ]; chap-end bounds
+        ;; the fuzzy search (replacing main_cur's per-chapter narrowing)
         (with-current-buffer epub
-          (goto-char notes-mark)
-          (insert (concat pagebreak "<h3>[ " (number-to-string (1+ chapter)) " ]</h3>"))
-          (set-marker notes-mark (point)))
-        (let ((note-num 1) chap-end)
-          (with-current-buffer b (fix-mismatches chapter))
-          ;; locate this chapter's base-text slice [ N ] .. [ N+1 ]; chap-end
-          ;; bounds the fuzzy search (replacing main_cur's per-chapter narrowing)
-          (with-current-buffer epub
-            (goto-char (point-min))
-            (search-forward (concat "[ " (number-to-string (1+ chapter)) " ]"))
-            (set-marker main-mark (match-beginning 0))
-            (if (< chapter 17)
-                (search-forward (concat "[ " (number-to-string (+ chapter 2)) " ]"))
-              (search-forward "<h2>Annotations</h2>"))
-            (setq chap-end (copy-marker (match-beginning 0)))
-            (when (= chapter 9)         ; Wandering Rocks: render <hr /> as "* * *"
-              (goto-char main-mark)
-              (while (search-forward "<hr />" (marker-position chap-end) t)
-                (replace-match "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>"))))
-          ;; narrow the chapter source to its body (drop trailing nav links)
-          (with-current-buffer b
-            (goto-char (point-min))
-            (search-forward "class=\"newchapter\"")
-            (search-forward ">")
-            (let ((body-start (point)))
-              (search-forward "<div id=\"footer\">")
-              (narrow-to-region body-start (point)))
-            (goto-char (point-min)))
-          ;; each <a href=...>text</a> link in the chapter source
-          (catch 'chapter-done
-            (while t
-              (let (url colour text)
-                (with-current-buffer b
-                  (when (not (search-forward "href=\"" nil t)) (throw 'chapter-done nil))
-                  (let ((s (point))) (search-forward "\"") (setq url (buffer-substring s (match-beginning 0))))
-                  (search-forward "data-color=\"")
-                  (let ((s (point))) (search-forward "\"") (setq colour (buffer-substring s (match-beginning 0))))
-                  (search-forward ">")
-                  (let ((s (point))) (search-forward "</a>") (setq text (buffer-substring s (match-beginning 0)))))
-                (setq total (1+ total))
-                (if (with-current-buffer epub
-                      (goto-char main-mark)
-                      (when (find-fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
-                    (let ((note-str (number-to-string note-num))
-                          (note-ref-str (number-to-string found)))
-                      (if (insert-footnote url note-str note-ref-str epub notes-mark notes-box)
-                          (progn
-                            (with-current-buffer epub
-                              (goto-char main-mark)
-                              (if (and use-colour (not (string= colour "")))
-                                  (insert (concat "<sup><a id=\"jpref" note-ref-str "\" style=\"color:#" colour "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>"))
-                                (insert (concat "<sup><a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>")))
-                              (set-marker main-mark (point)))
-                            (setq found (1+ found))
-                            (setq note-num (1+ note-num)))
-                        (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
-                        (setq annotation-failures (1+ annotation-failures))))
-                  (with-current-buffer epub
-                    (goto-char main-mark)
-                    (let ((ctx (buffer-substring (point) (min (point-max) (+ (point) 100)))))
-                      (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
-                  (setq not-found (1+ not-found)))))))
-        (set-buffer epub)            ; can't kill the current buffer
-        (kill-buffer b))
+          (goto-char (point-min))
+          (search-forward (concat "[ " (number-to-string (1+ chapter)) " ]"))
+          (set-marker main-mark (match-beginning 0))
+          (if (< chapter 17)
+              (search-forward (concat "[ " (number-to-string (+ chapter 2)) " ]"))
+            (search-forward "<h2>Annotations</h2>"))
+          (setq chap-end (copy-marker (match-beginning 0)))
+          (when (= chapter 9)         ; Wandering Rocks: render <hr /> as "* * *"
+            (goto-char main-mark)
+            (while (search-forward "<hr />" (marker-position chap-end) t)
+              (replace-match "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>"))))
+        ;; each annotation link in the chapter, in document order
+        (dolist (link (chapter-links chapter))
+          (let ((url (nth 0 link)) (colour (nth 1 link)) (text (nth 2 link)))
+            (setq total (1+ total))
+            (if (with-current-buffer epub
+                  (goto-char main-mark)
+                  (when (find-fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
+                (let ((note-str (number-to-string note-num))
+                      (note-ref-str (number-to-string found)))
+                  (if (insert-footnote url note-str note-ref-str epub notes-mark notes-box)
+                      (progn
+                        (with-current-buffer epub
+                          (goto-char main-mark)
+                          (if (and use-colour (not (string= colour "")))
+                              (insert (concat "<sup><a id=\"jpref" note-ref-str "\" style=\"color:#" colour "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>"))
+                            (insert (concat "<sup><a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>")))
+                          (set-marker main-mark (point)))
+                        (setq found (1+ found))
+                        (setq note-num (1+ note-num)))
+                    (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
+                    (setq annotation-failures (1+ annotation-failures))))
+              (with-current-buffer epub
+                (goto-char main-mark)
+                (let ((ctx (buffer-substring (point) (min (point-max) (+ (point) 100)))))
+                  (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
+              (setq not-found (1+ not-found))))))
       (setq chapter (1+ chapter)))
     (message (concat "total:" (number-to-string total)))
     (message (concat "found:" (number-to-string found)))
