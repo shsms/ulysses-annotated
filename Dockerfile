@@ -3,8 +3,8 @@ from fedora:33 as builder
 workdir /root/
 run dnf install -y git go
 
-run curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
-run tar -xvf mime-linux-amd64.tar.gz
+run curl -fOL https://github.com/shsms/mime-rs/releases/download/v0.1.0/mime-linux-x86_64.tar.gz
+run tar -xzf mime-linux-x86_64.tar.gz
 
 copy ./ ulysses-annotated
 run cd ulysses-annotated/scripts && go build dl-anno.go

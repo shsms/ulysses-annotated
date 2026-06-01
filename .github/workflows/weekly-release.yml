@@ -28,8 +28,8 @@ jobs:
           sudo -H pip3 install ebookmaker pytidylib
       - name: get mime
         run: |
-          curl -OL https://github.com/shsms/mime/releases/latest/download/mime-linux-amd64.tar.gz
-          tar -xvf mime-linux-amd64.tar.gz
+          curl -fOL https://github.com/shsms/mime-rs/releases/download/v0.1.0/mime-linux-x86_64.tar.gz
+          tar -xzf mime-linux-x86_64.tar.gz
           chmod +x mime
       - name: download annotations
         run: |
