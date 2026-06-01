@@ -32,17 +32,20 @@ The provided [go](https://golang.org/) program downloads the annotations from th
 
 This fetches each chapter and note over the API (sequentially, to stay gentle on the server) into `ulysses-annotated/scripts/annotations-raw`.  Raw API responses are cached under `annotations-raw/.api-cache`,  so reruns don't refetch.
 
-### Download and build mime
+### Download mime
 
-[Mime](https://github.com/shsms/mime) is a text processing framework that we use for adding annotations to the epub source file,  from the joyceproject files downloaded in the previous step.  Mime is written in C++ and you need a C++ compiler to build it.  It currently works only on linux.
+[mime-rs](https://github.com/shsms/mime-rs) is the scriptable text-editing engine we use to add the annotations to the EPUB source,  from the joyceproject files downloaded in the previous step.  Download the prebuilt Linux x86_64 binary into the repository root:
 
-Follow the instructions in the mime [Getting started](https://mime.dev/getting-started.html) page to build mime.
+	cd ulysses-annotated
+	curl -fOL https://github.com/shsms/mime-rs/releases/download/v0.1.0/mime-linux-x86_64.tar.gz
+	tar -xzf mime-linux-x86_64.tar.gz
+	chmod +x mime
 
 
-### Run the provided mime scripts
+### Run the provided scripts
 
 	cd ulysses-annotated/scripts
-	make addanno
+	make addanno MIME=../mime
 
 This step would generate an annotated html file in `/tmp/annotated.htm` that the next stage would pick up.
 
