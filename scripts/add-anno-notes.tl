@@ -210,7 +210,7 @@
                 (setq total (1+ total))
                 (if (with-current-buffer epub
                       (goto-char main-mark)
-                      (when (find_fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
+                      (when (find-fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
                     (let ((note-str (number-to-string note-num))
                           (note-ref-str (number-to-string found)))
                       (if (insert-footnote url note-str note-ref-str epub notes-mark notes-box)

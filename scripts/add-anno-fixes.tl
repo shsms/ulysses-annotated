@@ -1,6 +1,6 @@
 ;;; add-anno text-cleanup transforms — join-repeated-links/italics, fix-basics,
 ;;; fix-cyclops, fix-ithaca, fix-mismatches. They edit the CURRENT buffer with
-;;; plain Emacs primitives; `find_fuzzy' is a shared fuzzy-search helper.
+;;; plain Emacs primitives; `find-fuzzy' is a shared fuzzy-search helper.
 
 ;; Collapse two adjacent same-target links (matched fuzzily by PATTERN) into one,
 ;; replacing the join with TO-PASTE, when both <a> point at the same href.
@@ -10,7 +10,7 @@
 ;; its output differs from the legacy mime only at those (mime-erroneous) spots.
 (defun join-repeated-links (pattern to-paste)
   (goto-char (point-min))
-  (let ((rep-pos (find_fuzzy pattern)))
+  (let ((rep-pos (find-fuzzy pattern)))
     (while rep-pos
       ;; href values of the links on either side of the fuzzy-matched boundary
       (search-backward "href=\"")
@@ -27,16 +27,16 @@
             (search-forward ">")
             (delete-region start (point))
             (insert to-paste))))
-      (setq rep-pos (find_fuzzy pattern)))))
+      (setq rep-pos (find-fuzzy pattern)))))
 
 ;; Merge "</i> <i>" runs (point lands past the match, so mark=end, rep-pos=start).
 (defun join-repeated-italics ()
   (goto-char (point-min))
-  (let ((rep-pos (find_fuzzy "</i> <i>")))
+  (let ((rep-pos (find-fuzzy "</i> <i>")))
     (while rep-pos
       (delete-region rep-pos (point))
       (insert " ")
-      (setq rep-pos (find_fuzzy "</i> <i>")))))
+      (setq rep-pos (find-fuzzy "</i> <i>")))))
 
 ;; First-stage cleanup: normalise the characters the Joyce-Project API encodes
 ;; differently from the Gutenberg base, drop <br/> noise, and strip page spans.

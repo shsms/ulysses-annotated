@@ -1,8 +1,7 @@
-;;; add-anno structure/reorder transforms — ports of the same-named functions in
-;;; add-anno.mime, editing the CURRENT buffer. The reorders and the anchor fixer
-;;; below have been migrated to plain Emacs primitives; the document-structure
-;;; edits (update_*, *_first_page, insert_preface) still use mime-compat pending
-;;; migration.
+;;; add-anno structure/reorder transforms — the reorders, the chapter-anchor
+;;; fixer, and the document-structure edits (CSS, title page, TOC, preface),
+;;; all editing the CURRENT buffer with plain Emacs primitives. The fuzzy search
+;;; (find-fuzzy) is the one shared helper.
 
 ;; Move a passage between two anchor phrases to just after a third.
 (defun lotus-reorder ()
@@ -80,7 +79,7 @@
 
 (defun update-author-formatting ()
   (replace-string "<p class=\"title3\">Ulysses</p>" "<p class=\"title3\"><em>Ulysses</em></p>")
-  (let* ((start (find_fuzzy "<h2> by James Joyce </h2>"))
+  (let* ((start (find-fuzzy "<h2> by James Joyce </h2>"))
          (end (point)))
     (delete-region start end)
     (goto-char start)
@@ -97,7 +96,7 @@
   (let ((ii 1))
     (while (<= ii 18)
       (let* ((iis (number-to-string ii))
-             (start (find_fuzzy (concat "[ " iis " ]")))
+             (start (find-fuzzy (concat "[ " iis " ]")))
              (end (point)))
         (delete-region start end)
         (goto-char start)
