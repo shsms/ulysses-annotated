@@ -211,7 +211,8 @@
             (let ((s (point))) (search-forward "\"") (setq colour (buffer-substring s (match-beginning 0))))
             (search-forward ">")
             (let ((s (point))) (search-forward "</a>") (setq text (buffer-substring s (match-beginning 0))))
-            (setq links (cons (list url colour text) links))))))
+            ;; precompute the fuzzy-search regex once (reused by both builds)
+            (setq links (cons (list url colour text (fuzzy-regex text)) links))))))
     (kill-buffer b)
     (reverse links)))
 
@@ -251,11 +252,11 @@
               (replace-match "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>"))))
         ;; each annotation link in the chapter, in document order
         (dolist (link (chapter-links chapter))
-          (let ((url (nth 0 link)) (colour (nth 1 link)) (text (nth 2 link)))
+          (let ((url (nth 0 link)) (colour (nth 1 link)) (text (nth 2 link)) (regex (nth 3 link)))
             (setq total (1+ total))
             (if (with-current-buffer epub
                   (goto-char main-mark)
-                  (when (find-fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
+                  (when (re-search-forward regex (marker-position chap-end) t) (set-marker main-mark (point)) t))
                 (let ((note-str (number-to-string note-num))
                       (note-ref-str (number-to-string found)))
                   (if (insert-footnote url note-str note-ref-str epub notes-mark notes-box)
