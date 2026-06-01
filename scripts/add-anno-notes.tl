@@ -78,55 +78,60 @@
       (delete-region start (point))))
   (goto-char (point-min)) (replace-string "</meta>" ""))
 
-;; ---- one footnote: read the note file, build the footnote, paste into epub ---
-(defun insert-footnote (filename note-id note-ref-id epub notes-mark notes-box)
-  (let ((note-b (generate-new-buffer "note")))
+;; ---- note files: read + clean once, cache the components by filename ---------
+;; Reading and cleaning a note file is the pipeline's hottest work, and the ~1195
+;; distinct notes are each cited many times across the two (mono/colour) runs and
+;; the index, so we cache the per-file components. The cache persists process-wide.
+(setq *note-cache* (list nil))
+
+;; Read FILENAME's note and return (HAS-TITLE TITLE PRE POST EXT-FOUND EXT-BODY):
+;; PRE/POST are the cleaned note body split at its last </p> (the per-call backlink
+;; goes between them); EXT-BODY is the cleaned extended note (or ""). Returns
+;; 'failed for an empty/unreadable/malformed note.
+(defun compute-note-components (filename)
+  (let ((note-b (generate-new-buffer "note")) (result 'failed))
     (unwind-protect
         (catch 'done
-          (let (note (extended-found t) extended-note)
-            ;; ---- build the footnote text (and any extended note) in note-b ----
-            (with-current-buffer note-b
-              ;; a missing/unreadable note file reads as empty (mime's buffer()
-              ;; does the same) -> treated as a failed annotation below.
-              (condition-case e (insert-file-contents (concat basepath "/" filename)) (error nil))
+          (with-current-buffer note-b
+            ;; a missing/unreadable note file reads as empty (mime's buffer() does
+            ;; the same) -> treated as a failed annotation by the caller.
+            (condition-case e (insert-file-contents (concat basepath "/" filename)) (error nil))
+            (goto-char (point-min))
+            (when (= (point-min) (point-max)) (throw 'done nil))
+            (let ((title "(title unknown)") (has-title nil))
+              (if (search-forward "<title>" nil t)
+                  (let ((ts (point)))
+                    (if (search-forward "</title>" nil t)
+                        (progn (setq title (buffer-substring ts (match-beginning 0))) (setq has-title t))
+                      (message (concat "error: title end tag not found: " filename))
+                      (throw 'done nil)))
+                (message (concat "warning: unable to find title for note: " filename)))
               (goto-char (point-min))
-              (when (= (point-min) (point-max)) (throw 'done nil))
-              (let ((title "(title unknown)"))
-                (if (search-forward "<title>" nil t)
-                    (let ((ts (point)))
-                      (if (search-forward "</title>" nil t)
-                          (setq title (buffer-substring ts (match-beginning 0)))
-                        (message (concat "error: title end tag not found: " filename))
-                        (throw 'done nil))
-                      (add_to_notes_map notes-box title filename))
-                  (message (concat "warning: unable to find title for note: " filename)))
-                (goto-char (point-min))
-                (when (not (search-forward "<div id=\"note\">" nil t))
-                  (message (concat "error: couldn't find starting point of note: " filename))
-                  (throw 'done nil))
-                (let ((body-start (point)))
-                  (search-forward "</div>")
-                  (narrow-to-region body-start (match-beginning 0)))
-                (cleanup-note)
-                (goto-char (point-min))
-                (let ((title-with-id (if (string= note-id "") title (concat note-id ". " title))))
-                  (insert (concat "<font size=\"+1\"><em>" title-with-id "</em></font>\n")))
-                (goto-char (point-max))
-                (search-backward "</p>")
-                (insert (concat " <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">⤶</a>"))
-                (setq note (buffer-substring (point-min) (point-max)))
+              (when (not (search-forward "<div id=\"note\">" nil t))
+                (message (concat "error: couldn't find starting point of note: " filename))
+                (throw 'done nil))
+              (let ((body-start (point)))
+                (search-forward "</div>")
+                (narrow-to-region body-start (match-beginning 0)))
+              (cleanup-note)
+              ;; split the cleaned body at its last </p>; the backlink lands there
+              (goto-char (point-max))
+              (search-backward "</p>")
+              (let ((pre (buffer-substring (point-min) (point)))
+                    (post (buffer-substring (point) (point-max)))
+                    (ext-found t) (ext-body ""))
                 ;; widen past the note body to look for an extended note
                 (goto-char (point-max))
                 (widen)
                 (if (not (re-search-forward "<div id=\"expandednote\".*>" nil t))
                     (progn
                       (message (concat "error: couldn't find extended note: " filename))
-                      (setq extended-found nil))
+                      (setq ext-found nil))
                   (let ((ext-start (point)))
                     (if (not (search-forward "<div id=\"button\"" nil t))
                         (progn
                           (message (concat "error: couldn't fine end of extended note: " filename))
-                          (setq extended-found nil))
+                          (setq ext-found nil))
                       (search-backward "</div>")
                       (narrow-to-region ext-start (point))
                       (cleanup-note)
@@ -138,22 +143,45 @@
                         (goto-char (point-min))
                         (when (re-search-forward "<p>JH 20[0-9][0-9]</p>" nil t)
                           (delete-region (match-beginning 0) (match-end 0))))
-                      (setq extended-note (buffer-substring (point-min) (point-max))))))))
-            ;; ---- append the footnote to the Annotations section at notes-mark --
-            (with-current-buffer epub
-              (goto-char notes-mark)
-              (insert pagebreak)
-              (if (not extended-found)
-                  (insert (concat "<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" note-ref-id "\">"
-                                  note
-                                  "Back to <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n"))
+                      (setq ext-body (buffer-substring (point-min) (point-max))))))
+                (setq result (list has-title title pre post ext-found ext-body))))))
+      (set-buffer *home-buffer*)
+      (kill-buffer note-b))
+    result))
+
+(defun note-components (filename)
+  (let ((hit (assoc filename (car *note-cache*))))
+    (if hit
+        (cdr hit)
+      (let ((result (compute-note-components filename)))
+        (setcar *note-cache* (cons (cons filename result) (car *note-cache*)))
+        result))))
+
+;; ---- one footnote: assemble from the (cached) components, append to epub ------
+(defun insert-footnote (filename note-id note-ref-id epub notes-mark notes-box)
+  (let ((nc (note-components filename)))
+    (if (eq nc 'failed)
+        nil
+      (let ((has-title (nth 0 nc)) (title (nth 1 nc)) (pre (nth 2 nc))
+            (post (nth 3 nc)) (ext-found (nth 4 nc)) (ext-body (nth 5 nc)))
+        (when has-title (add_to_notes_map notes-box title filename))
+        (let ((note (concat "<font size=\"+1\"><em>"
+                            (if (string= note-id "") title (concat note-id ". " title))
+                            "</em></font>\n" pre
+                            " <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">⤶</a>"
+                            post)))
+          (with-current-buffer epub
+            (goto-char notes-mark)
+            (insert pagebreak)
+            (if (not ext-found)
                 (insert (concat "<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" note-ref-id "\">"
-                                note "<br/><u><em>Read more</em></u>" extended-note
-                                "Back to <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n")))
-              (set-marker notes-mark (point))
-              (throw 'done t))))
-      (set-buffer epub)
-      (kill-buffer note-b))))
+                                note
+                                "Back to <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n"))
+              (insert (concat "<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" note-ref-id "\">"
+                              note "<br/><u><em>Read more</em></u>" ext-body
+                              "Back to <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n")))
+            (set-marker notes-mark (point))
+            t))))))
 
 ;; ---- walk every chapter, attach a footnote per matched annotation ------------
 ;; MAIN-MARK tracks the base-text insert point; NOTES-MARK the Annotations append
