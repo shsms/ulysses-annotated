@@ -21,7 +21,8 @@
 ;; whitespace runs; quote each word and rejoin with \s+.
 (defun fuzzy-regex (needle)
   (concat "(?i)" (mapconcat (lambda (w) (regexp-quote w)) (split-string needle) "\\s+")))
-(defun find_fuzzy (s)  (and (re-search-forward (fuzzy-regex s) nil t) (match-beginning)))
+(defun find_fuzzy (s &optional bound)
+  (and (re-search-forward (fuzzy-regex s) bound t) (match-beginning)))
 (defun replace (from to &optional n)
   "Literal replace of FROM by TO from point; with N, at most N occurrences."
   (if n

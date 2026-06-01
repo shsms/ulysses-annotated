@@ -18,19 +18,19 @@
 (setq *home-buffer* (current-buffer))
 
 (defun make_epub (use-colours outfile)
-  (setq *cursor* nil)
   (setq basepath (arg "anno_path"))
   ;; Quire-backed (find-file) so the thousands of mid-document noteref inserts
   ;; into the growing ~38MB result stay O(log n); killed at the end so the next
   ;; run re-reads the infile fresh rather than reusing this modified buffer.
   (let ((epub (find-file (arg "infile"))))
     (goto-char (point-min))
-    (let ((main-cur (new_cursor))
-          (notes-cur (new_cursor))
-          (index-cur (new_cursor))
+    ;; three independent edit positions in the one epub buffer: the base text
+    ;; (where noterefs go), the Annotations section, and the Index section.
+    (let ((main-mark (point-marker))
+          (notes-mark (point-marker))
+          (index-mark (point-marker))
           (stats (list nil))
           (notes-box (list nil)))
-      (use_cursor main-cur)
       (add-epub-namespace)
       (update-css)
       (if use-colours
@@ -39,19 +39,21 @@
       (update-author-formatting)
       (update-toc)
       (insert-preface)
-      (let ((end-pos (prepare_notes_cursor notes-cur)))
-        (prepare_main_cursor main-cur end-pos))
-      (lotus-reorder)
-      (aeolus-reorder)
-      (penelope-reorder)
-      (fix-chapter-anchors)
-      (add_notes epub main-cur notes-cur use-colours notes-box stats)
-      (use_cursor notes-cur)
-      (let ((notes-cur-pos (get_pos)))
-        (use_cursor index-cur)
-        (goto_pos notes-cur-pos))
-      (add_notes_index epub notes-box index-cur notes-cur stats)
-      (set-buffer epub)
+      ;; bound the reorders + anchor fixer to the book body: the front matter and
+      ;; the freshly-built Annotations section must stay untouched.
+      (let ((body-start (point))
+            (end-pos (prepare-notes-section notes-mark)))
+        (narrow-to-region body-start end-pos)
+        (goto-char (point-min))
+        (lotus-reorder)
+        (aeolus-reorder)
+        (penelope-reorder)
+        (fix-chapter-anchors)
+        (widen))
+      (add-notes epub main-mark notes-mark use-colours notes-box stats)
+      ;; the Index section begins where the Annotations section now ends
+      (set-marker index-mark (marker-position notes-mark))
+      (add-notes-index epub notes-box index-mark notes-mark stats)
       (widen)
       (write-file outfile)
       (set-buffer *home-buffer*)

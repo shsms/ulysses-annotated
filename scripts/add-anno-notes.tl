@@ -1,11 +1,13 @@
-;;; add-anno notes machinery — ports of prepare_*_cursor, cleanup_note,
-;;; add_to_notes_map, insert_footnote, add_notes, add_notes_index.
+;;; add-anno notes machinery — prepare-notes-section, cleanup-note,
+;;; add_to_notes_map, insert-footnote, add-notes, add-notes-index.
 ;;;
-;;; Buffer model: epub is the main buffer with cursors (use_cursor switches to
-;;; it). The per-chapter source `b' and each note file are separate buffers,
-;;; read FRESH (generate-new-buffer + insert-file-contents) because find-file
-;;; reuses by name and these get modified; they use narrow_here (plain), never
-;;; narrow_to_region (which is reserved for the epub cursors).
+;;; Buffer model: the epub holds THREE markers — the base-text insert point, the
+;;; Annotations append point, and the Index append point — each advanced with
+;;; set-marker after its inserts. The per-chapter base-text slice is bounded by an
+;;; explicit search bound (a chap-end marker), not a narrowing. The per-chapter
+;;; source `b' and each note file are separate buffers entered via
+;;; with-current-buffer and read FRESH (generate-new-buffer + insert-file-contents),
+;;; because find-file reuses by name and these get modified.
 
 ;; ---- small structures -------------------------------------------------------
 ;; notes-index box: a 1-element list whose car is an alist  letter -> ((title . url)...)
@@ -23,25 +25,22 @@
             (setcdr lp (cons (cons title url) (cdr lp)))))
       (setcar box (cons (cons letter (list (cons title url))) alist)))))
 
-;; ---- cursor preparation -----------------------------------------------------
-(defun prepare_notes_cursor (notes-cur)
-  (use_cursor notes-cur)
-  (find "End of the Project Gutenberg EBook of Ulysses, by James Joyce")
-  (rfind "<pre")
-  (set_mark)
-  (find "</pre>")
-  (erase_region)
-  (let ((end-pos (get_pos)))
-    (paste (concat pagebreak "\n\n<h2>Annotations</h2>"))
-    (paste "<a name=\"link2H_4_annotations\" id=\"link2H_4_annotations\"> </a>\n")
+;; ---- Annotations section ----------------------------------------------------
+;; Replace the trailing Gutenberg licence <pre> with the Annotations heading,
+;; leaving NOTES-MARK at the append point. Returns the section's start position
+;; (where the base text ends) for bounding the body reorders.
+(defun prepare-notes-section (notes-mark)
+  (goto-char (point-min))
+  (search-forward "End of the Project Gutenberg EBook of Ulysses, by James Joyce")
+  (search-backward "<pre")
+  (let ((start (point)))
+    (search-forward "</pre>")
+    (delete-region start (point)))
+  (let ((end-pos (point)))
+    (insert (concat pagebreak "\n\n<h2>Annotations</h2>"))
+    (insert "<a name=\"link2H_4_annotations\" id=\"link2H_4_annotations\"> </a>\n")
+    (set-marker notes-mark (point))
     end-pos))
-
-(defun prepare_main_cursor (main-cur end-pos)
-  (use_cursor main-cur)
-  (set_mark)
-  (goto_pos end-pos)
-  (narrow_to_region)              ; bound main_cur to [here .. end-pos]
-  (start_of_buffer))
 
 ;; ---- note-file cleanup (operates on the CURRENT note buffer) -----------------
 (defun cleanup-note ()
@@ -80,7 +79,7 @@
   (goto-char (point-min)) (replace-string "</meta>" ""))
 
 ;; ---- one footnote: read the note file, build the footnote, paste into epub ---
-(defun insert_footnote (filename note-id note-ref-id epub notes-box)
+(defun insert-footnote (filename note-id note-ref-id epub notes-mark notes-box)
   (let ((note-b (generate-new-buffer "note")))
     (unwind-protect
         (catch 'done
@@ -140,8 +139,9 @@
                         (when (re-search-forward "<p>JH 20[0-9][0-9]</p>" nil t)
                           (delete-region (match-beginning 0) (match-end 0))))
                       (setq extended-note (buffer-substring (point-min) (point-max))))))))
-            ;; ---- paste the footnote into the epub at point (the notes cursor) ---
+            ;; ---- append the footnote to the Annotations section at notes-mark --
             (with-current-buffer epub
+              (goto-char notes-mark)
               (insert pagebreak)
               (if (not extended-found)
                   (insert (concat "<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" note-ref-id "\">"
@@ -150,120 +150,133 @@
                 (insert (concat "<div role=\"doc-footnote\" epub:type=\"footnote\" id=\"jpnote" note-ref-id "\">"
                                 note "<br/><u><em>Read more</em></u>" extended-note
                                 "Back to <a href=\"#jpref" note-ref-id "\" role=\"doc-backlink\" title=\"Go to note reference\">text</a>.</div>\n")))
+              (set-marker notes-mark (point))
               (throw 'done t))))
       (set-buffer epub)
       (kill-buffer note-b))))
 
 ;; ---- walk every chapter, attach a footnote per matched annotation ------------
-(defun add_notes (epub main-cur notes-cur use-colour notes-box stats)
+;; MAIN-MARK tracks the base-text insert point; NOTES-MARK the Annotations append
+;; point; both are markers in the epub. The per-chapter base-text slice is bounded
+;; by an explicit CHAP-END marker rather than a narrowing.
+(defun add-notes (epub main-mark notes-mark use-colour notes-box stats)
   (let ((total 0) (found 0) (not-found 0) (annotation-failures 0) (chapter 0))
     (while (< chapter 18)
       (let ((b (generate-new-buffer "chap")))
-        (set-buffer b)
-        (insert-file-contents (concat basepath (nth chapter chapters)))
-        (goto-char (point-min))
-        (use_cursor notes-cur)
-        (paste (concat pagebreak "<h3>[ " (to_string (1+ chapter)) " ]</h3>"))
-        (let ((note-num 1))
-          (set-buffer b)
-          (fix-mismatches chapter)
-          ;; bound the base-text cursor to this chapter's slice [ N ] .. [ N+1 ]
-          (use_cursor main-cur)
-          (widen)
-          (start_of_buffer)
-          (goto_pos (find (concat "[ " (to_string (1+ chapter)) " ]")))
-          (set_mark)
-          (if (< chapter 17)
-              (goto_pos (find (concat "[ " (to_string (+ chapter 2)) " ]")))
-            (goto_pos (find "<h2>Annotations</h2>")))
-          (narrow_to_region)
-          (start_of_buffer)
-          (when (= chapter 9)         ; Wandering Rocks: render <hr /> as "* * *"
-            (replace "<hr />" "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>" 100)
-            (start_of_buffer))
+        (with-current-buffer b
+          (insert-file-contents (concat basepath (nth chapter chapters)))
+          (goto-char (point-min)))
+        ;; the chapter's "[ N ]" heading into the Annotations section
+        (with-current-buffer epub
+          (goto-char notes-mark)
+          (insert (concat pagebreak "<h3>[ " (number-to-string (1+ chapter)) " ]</h3>"))
+          (set-marker notes-mark (point)))
+        (let ((note-num 1) chap-end)
+          (with-current-buffer b (fix-mismatches chapter))
+          ;; locate this chapter's base-text slice [ N ] .. [ N+1 ]; chap-end
+          ;; bounds the fuzzy search (replacing main_cur's per-chapter narrowing)
+          (with-current-buffer epub
+            (goto-char (point-min))
+            (search-forward (concat "[ " (number-to-string (1+ chapter)) " ]"))
+            (set-marker main-mark (match-beginning 0))
+            (if (< chapter 17)
+                (search-forward (concat "[ " (number-to-string (+ chapter 2)) " ]"))
+              (search-forward "<h2>Annotations</h2>"))
+            (setq chap-end (copy-marker (match-beginning 0)))
+            (when (= chapter 9)         ; Wandering Rocks: render <hr /> as "* * *"
+              (goto-char main-mark)
+              (while (search-forward "<hr />" (marker-position chap-end) t)
+                (replace-match "<p style=\"text-align: center; margin: 1.5em 0; font-size: 1.3em;\">* * *</p>"))))
           ;; narrow the chapter source to its body (drop trailing nav links)
-          (set-buffer b)
-          (find "class=\"newchapter\"")
-          (find ">")
-          (set_mark)
-          (find "<div id=\"footer\">")
-          (narrow_here)
-          (start_of_buffer)
-          (while (progn (set-buffer b) (find "href=\""))
-            (set_mark)
-            (goto_pos (find "\""))
-            (let ((url (copy)))
-              (find "data-color=\"")
-              (set_mark)
-              (goto_pos (find "\""))
-              (let ((colour (copy)))
-                (find ">")
-                (set_mark)
-                (goto_pos (find "</a>"))
-                (let ((text (copy)))
-                  (setq total (1+ total))
-                  (use_cursor main-cur)
-                  (if (find_fuzzy text)
-                      (let ((note-str (to_string note-num))
-                            (note-ref-str (to_string found)))
-                        (use_cursor notes-cur)
-                        (if (insert_footnote url note-str note-ref-str epub notes-box)
-                            (progn
-                              (use_cursor main-cur)
+          (with-current-buffer b
+            (goto-char (point-min))
+            (search-forward "class=\"newchapter\"")
+            (search-forward ">")
+            (let ((body-start (point)))
+              (search-forward "<div id=\"footer\">")
+              (narrow-to-region body-start (point)))
+            (goto-char (point-min)))
+          ;; each <a href=...>text</a> link in the chapter source
+          (catch 'chapter-done
+            (while t
+              (let (url colour text)
+                (with-current-buffer b
+                  (when (not (search-forward "href=\"" nil t)) (throw 'chapter-done nil))
+                  (let ((s (point))) (search-forward "\"") (setq url (buffer-substring s (match-beginning 0))))
+                  (search-forward "data-color=\"")
+                  (let ((s (point))) (search-forward "\"") (setq colour (buffer-substring s (match-beginning 0))))
+                  (search-forward ">")
+                  (let ((s (point))) (search-forward "</a>") (setq text (buffer-substring s (match-beginning 0)))))
+                (setq total (1+ total))
+                (if (with-current-buffer epub
+                      (goto-char main-mark)
+                      (when (find_fuzzy text (marker-position chap-end)) (set-marker main-mark (point)) t))
+                    (let ((note-str (number-to-string note-num))
+                          (note-ref-str (number-to-string found)))
+                      (if (insert-footnote url note-str note-ref-str epub notes-mark notes-box)
+                          (progn
+                            (with-current-buffer epub
+                              (goto-char main-mark)
                               (if (and use-colour (not (string= colour "")))
-                                  (paste (concat "<sup><a id=\"jpref" note-ref-str "\" style=\"color:#" colour "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>"))
-                                (paste (concat "<sup><a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>")))
-                              (setq found (1+ found))
-                              (setq note-num (1+ note-num)))
-                          (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
-                          (setq annotation-failures (1+ annotation-failures))))
-                    (use_cursor main-cur)
-                    (let ((miss-pos (get_pos)))
-                      (set_mark)
-                      (forward 100)
-                      (let ((ctx (copy)))
-                        (goto_pos miss-pos)
-                        (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
-                    (setq not-found (1+ not-found))))))))
+                                  (insert (concat "<sup><a id=\"jpref" note-ref-str "\" style=\"color:#" colour "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>"))
+                                (insert (concat "<sup><a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" note-str "</a></sup>")))
+                              (set-marker main-mark (point)))
+                            (setq found (1+ found))
+                            (setq note-num (1+ note-num)))
+                        (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
+                        (setq annotation-failures (1+ annotation-failures))))
+                  (with-current-buffer epub
+                    (goto-char main-mark)
+                    (let ((ctx (buffer-substring (point) (min (point-max) (+ (point) 100)))))
+                      (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
+                  (setq not-found (1+ not-found)))))))
         (set-buffer epub)            ; can't kill the current buffer
         (kill-buffer b))
       (setq chapter (1+ chapter)))
-    (message (concat "total:" (to_string total)))
-    (message (concat "found:" (to_string found)))
-    (message (concat "not_found:" (to_string not-found)))
+    (message (concat "total:" (number-to-string total)))
+    (message (concat "found:" (number-to-string found)))
+    (message (concat "not_found:" (number-to-string not-found)))
     (stat-set stats "total" total)
     (stat-set stats "found" found)
     (stat-set stats "not_found" not-found)
     (stat-set stats "broken_links" annotation-failures)))
 
 ;; ---- alphabetical "Index of Notes" ------------------------------------------
-(defun add_notes_index (epub notes-box index-cur notes-cur stats)
-  (use_cursor index-cur)
-  (paste pagebreak)
-  (paste "<h2>Index of Notes</h2>")
-  (paste "<a name=\"link2H_4_index_titles\" id=\"link2H_4_index_titles\"> </a>\n")
-  (paste "<p>All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note without locating its appearances in the text of the novel.</p>")
-  (use_cursor notes-cur)
-  (paste pagebreak)
-  (paste "<h3>Notes</h3>")
-  (use_cursor index-cur)
+(defun add-notes-index (epub notes-box index-mark notes-mark stats)
+  ;; index-mark and notes-mark both start at the end of the Annotations section;
+  ;; inserting the "Notes" subheading at notes-mark lands it just before the
+  ;; "Index of Notes" heading at index-mark, exactly as the two cursors did.
+  (with-current-buffer epub
+    (goto-char index-mark)
+    (insert pagebreak)
+    (insert "<h2>Index of Notes</h2>")
+    (insert "<a name=\"link2H_4_index_titles\" id=\"link2H_4_index_titles\"> </a>\n")
+    (insert "<p>All of the notes posted so far are listed here alphabetically by title. Click to go directly to a note without locating its appearances in the text of the novel.</p>")
+    (set-marker index-mark (point))
+    (goto-char notes-mark)
+    (insert pagebreak)
+    (insert "<h3>Notes</h3>")
+    (set-marker notes-mark (point)))
   (let ((count 0)
         (index (car notes-box)))
     (let ((letters (sort (mapcar (lambda (lp) (car lp)) index) (lambda (a b) (string< a b)))))
       (dolist (letter letters)
         (when (not (string= letter "Ü"))
-          (use_cursor index-cur)
-          (paste (concat "<h3>" letter "</h3>"))
+          (with-current-buffer epub
+            (goto-char index-mark)
+            (insert (concat "<h3>" letter "</h3>"))
+            (set-marker index-mark (point)))
           (let ((notes nil))
             (when (and (string= letter "U") (assoc "Ü" index))
               (setq notes (append notes (sort-titles (cdr (assoc "Ü" index))))))
             (setq notes (append notes (sort-titles (cdr (assoc letter index)))))
             (dolist (note notes)
-              (let ((note-ref-str (concat "iot-" (to_string count))))
-                (use_cursor notes-cur)
-                (when (insert_footnote (cdr note) "" note-ref-str epub (list nil))
-                  (use_cursor index-cur)
-                  (paste (concat "<a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" (car note) "</a><br />"))
+              (let ((note-ref-str (concat "iot-" (number-to-string count))))
+                (when (insert-footnote (cdr note) "" note-ref-str epub notes-mark (list nil))
+                  (with-current-buffer epub
+                    (goto-char index-mark)
+                    (insert (concat "<a id=\"jpref" note-ref-str "\" role=\"doc-noteref\" epub:type=\"noteref\" href=\"#jpnote" note-ref-str "\">" (car note) "</a><br />"))
+                    (set-marker index-mark (point)))
                   (setq count (1+ count)))))))))
-    (message (concat "distinct_notes: " (to_string count)))
+    (message (concat "distinct_notes: " (number-to-string count)))
     (stat-set stats "distinct_notes" count)))
