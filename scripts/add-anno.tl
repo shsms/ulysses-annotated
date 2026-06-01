@@ -1,17 +1,17 @@
 ;;; add-anno.tl — port of add-anno.mime: build the annotated Ulysses EPUB source
 ;;; from the Gutenberg base + the Joyce-Project annotation dump. Trusted tier:
 ;;;
-;;;   mime run --local add-anno.tl --infile IN --outfile OUT \
+;;;   mime run add-anno.tl --infile IN --outfile OUT \
 ;;;       --colour_outfile COUT --anno_path DIR --date DATE \
-;;;       --templates_path DIR [--with_badges 1]
+;;;       [--templates_path DIR] [--with_badges 1]
 ;;;
-;;; Modules are loaded by absolute path so the cwd does not matter.
+;;; Run from this directory: modules and templates load by relative path.
 
-(load "/vagrant/ulysses-annotated/scripts/fuzzy-search.tl")
-(load "/vagrant/ulysses-annotated/scripts/add-anno-globals.tl")
-(load "/vagrant/ulysses-annotated/scripts/add-anno-fixes.tl")
-(load "/vagrant/ulysses-annotated/scripts/add-anno-structure.tl")
-(load "/vagrant/ulysses-annotated/scripts/add-anno-notes.tl")
+(load "fuzzy-search.tl")
+(load "add-anno-globals.tl")
+(load "add-anno-fixes.tl")
+(load "add-anno-structure.tl")
+(load "add-anno-notes.tl")
 
 ;; A buffer to return to when killing each run's epub buffer (mime-rs forbids
 ;; killing the current buffer).

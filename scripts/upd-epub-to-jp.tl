@@ -1,7 +1,7 @@
 ;; Port of upd-epub-to-jp.mime — apply the Joyce-Project text reconciliations.
-;; Run: mime run --local upd-epub-to-jp.tl --file INFILE --outfile OUTFILE
-(load "/vagrant/ulysses-annotated/scripts/fuzzy-search.tl")  ; find-fuzzy
-(load "/vagrant/ulysses-annotated/scripts/jp-diffs.tl")      ; defines `items`
+;; Run from this directory: mime run upd-epub-to-jp.tl --infile INFILE --outfile OUTFILE
+(load "fuzzy-search.tl")  ; find-fuzzy
+(load "jp-diffs.tl")      ; defines `items`
 
 (defun update (from to)
   ;; find-fuzzy searches forward from point (diffs are in document order) and
@@ -10,6 +10,9 @@
       (progn (replace-match to) t)
     (message (concat "failed: " from))
     nil))
+
+;; Visit the input as the current buffer; the reconciliations below run on it.
+(find-file (arg "infile"))
 
 (let ((misses 0))
   (dolist (i items)
