@@ -1,6 +1,5 @@
-;; -*- js -*-
 ;; Gutenberg-base -> Joyce Project text reconciliations, applied in order by
-;; upd-epub-to-jp.mime.  Use place-diff.mime to find where a new diff belongs.
+;; upd-epub-to-jp.tl.  Use place-diff.tl to find where a new diff belongs.
 
 
 
