@@ -1,5 +1,5 @@
 // Command dl-anno downloads the Joyce Project annotations and writes them in
-// the on-disk layout that add-anno.mime consumes.
+// the on-disk layout that add-anno.tl consumes.
 //
 // The Joyce Project replaced its old PHP site (which dl-anno used to crawl via
 // ideacrawler) with a JSON API.  See issue #16.  Each chapter is now served at
@@ -43,7 +43,7 @@ import (
 const apiBase = "https://joyceproject.com/api"
 const userAgent = "ulysses-annotated weekly build (+https://github.com/shsms/ulysses-annotated)"
 
-// chapter number (1-based) -> output slug, matching add-anno.mime's chapters[].
+// chapter number (1-based) -> output slug, matching add-anno.tl's chapters.
 var slugs = []string{
 	"telem", "nestor", "proteus", "calypso", "lotus", "hades", "aeolus", "lestry",
 	"scylla", "wrocks", "sirens", "cyclops", "nausicaa", "oxen", "circe", "eumaeus",
@@ -170,7 +170,7 @@ func slugFor(number int) string {
 
 // buildChapter rewrites the inline annotation anchors to point at local note
 // files (keeping their colour) and wraps the prose with the newchapter/footer
-// markers add-anno.mime narrows between.  It returns the referenced note ids.
+// markers that delimit each chapter for add-anno.tl.  It returns the referenced note ids.
 func buildChapter(src, title string) (string, []string) {
 	var ids []string
 	for _, m := range annoRe.FindAllStringSubmatch(src, -1) {

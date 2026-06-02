@@ -4,10 +4,8 @@
 
 ;; Collapse two adjacent same-target links (matched fuzzily by PATTERN) into one,
 ;; replacing the join with TO-PASTE, when both <a> point at the same href.
-;; The href equality test is exact here. The original add-anno.mime relied on a
-;; ChaiScript string `==` that mis-compared ~14 distinct-href pairs per run as
-;; equal, spuriously merging unrelated notes; this port compares correctly, so
-;; its output differs from the legacy mime only at those (mime-erroneous) spots.
+;; The href equality test must be exact: a loose string compare can treat two
+;; distinct-but-similar note hrefs as equal and spuriously merge unrelated notes.
 (defun join-repeated-links (pattern to-paste)
   (goto-char (point-min))
   (let ((rep-pos (find-fuzzy pattern)))

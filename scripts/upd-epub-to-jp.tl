@@ -1,4 +1,4 @@
-;; Port of upd-epub-to-jp.mime — apply the Joyce-Project text reconciliations.
+;; Apply the Joyce-Project text reconciliations to the EPUB source.
 ;; Run from this directory: mime run upd-epub-to-jp.tl --infile INFILE --outfile OUTFILE
 (load "fuzzy-search.tl")  ; find-fuzzy
 (load "jp-diffs.tl")      ; defines `items`

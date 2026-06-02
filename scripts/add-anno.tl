@@ -1,4 +1,4 @@
-;;; add-anno.tl — port of add-anno.mime: build the annotated Ulysses EPUB source
+;;; add-anno.tl — build the annotated Ulysses EPUB source
 ;;; from the Gutenberg base + the Joyce-Project annotation dump. Trusted tier:
 ;;;
 ;;;   mime run add-anno.tl --infile IN --outfile OUT \
