@@ -1,3 +1,5 @@
+name: Weekly rebuild
+
 on:
   workflow_dispatch:
     inputs:
@@ -10,79 +12,63 @@ on:
         required: true
         default: 'true'
   schedule:
-    - cron:  '10 2 * * 0'
-name: Weekly rebuild
+    - cron: '10 2 * * 0'
+
+permissions:
+  contents: write # create the release and push to gh-pages
+
 jobs:
   generate:
     name: generate annotated epub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@master
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: install-deps
         run: |
           sudo apt-get update
-          sudo apt-get remove python
-          sudo apt-get install python3 tidy calibre python3-pip
-          sudo -H pip3 install setuptools
-          sudo -H pip3 install ebookmaker pytidylib
+          sudo apt-get install -y tidy calibre python3-venv
+          # ebookmaker in a venv: Ubuntu's system Python is externally managed.
+          python3 -m venv "$HOME/ebm"
+          "$HOME/ebm/bin/pip" install --upgrade pip setuptools
+          "$HOME/ebm/bin/pip" install ebookmaker pytidylib
+          echo "$HOME/ebm/bin" >> "$GITHUB_PATH"
       - name: get mime
         run: |
           curl -fOL https://github.com/shsms/mime-rs/releases/download/v0.1.0/mime-linux-x86_64.tar.gz
           tar -xzf mime-linux-x86_64.tar.gz
           chmod +x mime
       - name: download annotations
-        run: |
-          make -C scripts download
+        run: make -C scripts download
         timeout-minutes: 30
       - name: add annotations
         run: |
           MIME=../mime make -C scripts addanno
           mkdir -p reader/badges
           cp scripts/badge-*json reader/badges/
-
       - name: generate epub
         run: |
-          export PATH=$PATH:${PWD}
           make -C scripts epub
           cp ulysses-annotated.epub reader/
-
-      - name: env vars
+      - name: Create the release and upload the epubs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_INPUT: ${{ github.event.inputs.tag }}
+          DRAFT_INPUT: ${{ github.event.inputs.draft }}
         run: |
-          if [[ "${{ github.event.inputs.tag }}" != "" ]]; then
-              echo "TAG_STR=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
-          else
-              echo "TAG_STR=v$(date +%Y.%m.%d)" >> $GITHUB_ENV
-          fi
-          if [[ "${{ github.event.inputs.draft }}" != "" ]]; then
-              echo "DRAFT_STR=${{ github.event.inputs.draft }}" >> $GITHUB_ENV
-          else
-              echo "DRAFT_STR=false" >> $GITHUB_ENV
-          fi
-
-      - name: Create Release
-        id: createrelease
-        uses: actions/create-release@latest
+          if [ -n "$TAG_INPUT" ]; then tag="$TAG_INPUT"; else tag="v$(date +%Y.%m.%d)"; fi
+          draft=
+          if [ "$DRAFT_INPUT" = "true" ]; then draft=--draft; fi
+          gh release create "$tag" ulysses-annotated*.epub \
+            --title "$tag" --generate-notes $draft
+      - name: Deploy the web reader to gh-pages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.TAG_STR }}
-          release_name: ${{ env.TAG_STR }}
-          draft: ${{ env.DRAFT_STR }}
-          prerelease: false
-
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseId: ${{ steps.createrelease.outputs.id }}
-          args: 'ulysses-annotated*.epub'
-
-      - name: Deploy web reader
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: reader
-          CLEAN: true
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd reader
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -q -m "Deploy web reader (${GITHUB_SHA})"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
