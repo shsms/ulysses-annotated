@@ -22,3 +22,7 @@ ebookmaker \
 	--cover ../cover.jpg \
 	colour_annotated.htm
 
+# ebookmaker's epub.images make-type writes "<output-file>-images-epub.epub";
+# rename to the expected filenames (as the Makefile's epub target does).
+mv /datadir/ulysses-annotated.epub-images-epub.epub /datadir/ulysses-annotated.epub
+mv /datadir/ulysses-annotated-colour.epub-images-epub.epub /datadir/ulysses-annotated-colour.epub
