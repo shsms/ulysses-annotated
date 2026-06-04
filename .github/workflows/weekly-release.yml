@@ -36,6 +36,8 @@ jobs:
       - name: get mime
         run: |
           curl -fOL https://github.com/shsms/mime-rs/releases/download/v0.1.0/mime-linux-x86_64.tar.gz
+          # Pin the v0.1.0 asset's checksum; update it when bumping the version.
+          echo "2ebfc3ce2f47707dce1bc398208462469665a91316f1852ba30c13b76e895a2a  mime-linux-x86_64.tar.gz" | sha256sum -c -
           tar -xzf mime-linux-x86_64.tar.gz
           chmod +x mime
       - name: download annotations
@@ -71,4 +73,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
           git commit -q -m "Deploy web reader (${GITHUB_SHA})"
-          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+          # Auth via a transient header so the token never lands in the remote URL.
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git -c http.extraheader="AUTHORIZATION: basic ${auth}" \
+            push -f "https://github.com/${GITHUB_REPOSITORY}.git" gh-pages
