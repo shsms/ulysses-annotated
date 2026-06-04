@@ -1,4 +1,4 @@
-;;; fuzzy-search — the original mime's find_fuzzy as plain Emacs primitives.
+;;; fuzzy-search — fuzzy forward search as plain Emacs primitives.
 ;;; Shared by add-anno.tl and upd-epub-to-jp.tl.
 
 ;; Compile NEEDLE to a regex: case-insensitive, with leading/trailing whitespace

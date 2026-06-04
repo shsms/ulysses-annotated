@@ -93,8 +93,8 @@
     (unwind-protect
         (catch 'done
           (with-current-buffer note-b
-            ;; a missing/unreadable note file reads as empty (mime's buffer() does
-            ;; the same) -> treated as a failed annotation by the caller.
+            ;; a missing/unreadable note file reads as empty and is treated as a
+            ;; failed annotation by the caller.
             (condition-case e (insert-file-contents (concat basepath "/" filename)) (error nil))
             (goto-char (point-min))
             (when (= (point-min) (point-max)) (throw 'done nil))
@@ -130,7 +130,7 @@
                   (let ((ext-start (point)))
                     (if (not (search-forward "<div id=\"button\"" nil t))
                         (progn
-                          (message (concat "error: couldn't fine end of extended note: " filename))
+                          (message (concat "error: couldn't find end of extended note: " filename))
                           (setq ext-found nil))
                       (search-backward "</div>")
                       (narrow-to-region ext-start (point))

@@ -4,7 +4,7 @@
 (setq basepath "")
 
 ;; Directory holding the templates (preface.htm, firstpage-*.htm); set in main.
-;; Empty means cwd-relative, matching mime's bare buffer("preface.htm").
+;; Empty means cwd-relative (templates load from the working directory).
 (setq templates-path "")
 
 (setq chapters (list
