@@ -4,7 +4,7 @@ date=$(bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
 
 cd scripts
 mime run upd-epub-to-jp.tl --infile ../4300-h/4300-h.htm --outfile updated-to-jp.htm </dev/null
-mime run add-anno.tl --date "${date}" --anno_path /datadir/annotations-raw/ --infile updated-to-jp.htm --outfile annotated.htm --colour_outfile colour_annotated.htm </dev/null
+mime run add-anno.tl --date "${date}" --anno_path /datadir/annotations-raw --infile updated-to-jp.htm --outfile annotated.htm --colour_outfile colour_annotated.htm </dev/null
 
 ebookmaker \
 	--make epub.images \
