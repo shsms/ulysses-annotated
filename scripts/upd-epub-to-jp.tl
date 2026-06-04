@@ -20,4 +20,4 @@
   (report "applied" (- (length items) misses))
   (report "misses" misses)
   (if (= misses 0) (write-file (arg "outfile"))
-    (message "some diffs failed; not writing output")))
+    (error "some diffs did not match the base; output not written")))
