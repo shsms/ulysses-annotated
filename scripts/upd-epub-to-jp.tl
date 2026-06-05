@@ -11,6 +11,10 @@
     (message (concat "failed: " from))
     nil))
 
+;; Remember the empty primary buffer: the run ends back on it so the CLI's
+;; closing diff is empty instead of dumping the whole reconciled document.
+(setq *home-buffer* (current-buffer))
+
 ;; Visit the input as the current buffer; the reconciliations below run on it.
 (find-file (arg "infile"))
 
@@ -27,3 +31,5 @@
     (error (concat (number-to-string misses) " of " (number-to-string (length items))
                    " reconciliations did not match the base (first: \"" first-miss
                    "\"); output not written"))))
+
+(set-buffer *home-buffer*)
