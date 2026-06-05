@@ -277,17 +277,14 @@
                         (setq note-num (1+ note-num)))
                     (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
                     (setq broken-list
-                          (cons (concat (nth chapter chapter-names) ": \"" text "\" -> " url)
-                                broken-list))
+                          (cons (list (nth chapter chapter-names) text url) broken-list))
                     (setq annotation-failures (1+ annotation-failures))))
               (with-current-buffer epub
                 (goto-char main-mark)
                 (let ((ctx (buffer-substring (point) (min (point-max) (+ (point) 100)))))
                   (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
               (setq unmatched-list
-                    (cons (concat (nth chapter chapter-names) ": "
-                                  (if (string= (string-trim text) "") "(empty link text)" text))
-                          unmatched-list))
+                    (cons (cons (nth chapter chapter-names) text) unmatched-list))
               (setq not-found (1+ not-found))))))
       (setq chapter (1+ chapter)))
     (message (concat "total:" (number-to-string total)))

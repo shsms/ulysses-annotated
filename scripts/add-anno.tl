@@ -98,40 +98,81 @@
       (insert (badge_json "distinct notes" (stat-get stats "distinct_notes") colour))
       (write-file "badge-distinct.json"))))
 
-;; Write FILENAME as HEADER, a blank line, then LINES one per line.
-(defun write-lines (filename header lines)
+;; Write FILENAME as LINES, one per line.
+(defun write-lines (filename lines)
   (let ((buf (generate-new-buffer "details")))
     (with-current-buffer buf
-      (insert header)
-      (insert "\n\n")
       (dolist (l lines) (insert l) (insert "\n"))
       (write-file filename))
     (kill-buffer buf)))
 
-;; The detail files the README badges link to: the unmatched and broken-link
-;; lists, plus the run summary that the success badges point at.
+;; An annotation's link text, made readable: markup stripped, no-break spaces
+;; normalised, trimmed, quoted; the empty case named in words.
+(defun clean-passage (text)
+  (let ((plain (string-trim
+                (replace-regexp-in-string "\\x{00A0}" " "
+                                          (replace-regexp-in-string "<[^>]+>" "" text)))))
+    (if (string= plain "") "(this annotation has no visible text)"
+      (concat "\"" plain "\""))))
+
+;; The detail files the README badges link to, written for a non-technical
+;; reader: a plain-language explanation up top, then numbered, labelled,
+;; blank-line-separated entries.
 (defun make-details (stats)
   (let ((total (number-to-string (stat-get stats "total")))
         (date (if (arg "date") (arg "date") "(undated)")))
-    (write-lines "unmatched.txt"
-                 (concat "Unmatched references — "
-                         (number-to-string (stat-get stats "not_found"))
-                         " of " total " — " date)
-                 (stat-get stats "unmatched_list"))
-    (write-lines "broken-links.txt"
-                 (concat "Broken links (reference matched, note unusable) — "
-                         (number-to-string (stat-get stats "broken_links"))
-                         " of " total " — " date)
-                 (stat-get stats "broken_list"))
+    (let ((lines nil) (n 0))
+      (dolist (u (stat-get stats "unmatched_list"))
+        (setq n (1+ n))
+        (setq lines (cons (concat (number-to-string n) ". Episode:      " (car u)) lines))
+        (setq lines (cons (concat "   Highlighted:  " (clean-passage (cdr u))) lines))
+        (setq lines (cons "" lines)))
+      (write-lines "unmatched.txt"
+                   (append (list (concat "Annotations that could not be placed — "
+                                         (number-to-string (stat-get stats "not_found"))
+                                         " of " total " — " date)
+                                 ""
+                                 "These annotations were skipped: the passage each one highlights could"
+                                 "not be found in the text of the book. The annotation is left out of"
+                                 "this edition; everything else is unaffected."
+                                 "")
+                           (reverse lines))))
+    (let ((lines nil) (n 0))
+      (dolist (b (stat-get stats "broken_list"))
+        (setq n (1+ n))
+        (setq lines (cons (concat (number-to-string n) ". Episode:      " (nth 0 b)) lines))
+        (setq lines (cons (concat "   Highlighted:  " (clean-passage (nth 1 b))) lines))
+        (setq lines (cons (concat "   Note file:    " (nth 2 b)) lines))
+        (setq lines (cons "" lines)))
+      (write-lines "broken-links.txt"
+                   (append (list (concat "Annotations whose note could not be read — "
+                                         (number-to-string (stat-get stats "broken_links"))
+                                         " of " total " — " date)
+                                 ""
+                                 "The highlighted passage was found in the book, but the note that"
+                                 "should open there could not be read from the joyceproject.com"
+                                 "download, so the note marker was left out. The note's file name is"
+                                 "included in case someone wants to report it."
+                                 "")
+                           (reverse lines))))
     (write-lines "build-report.txt"
-                 (concat "ulysses-annotated build report — " date)
-                 (list (concat "total references:  " total)
-                       (concat "matched:           " (number-to-string (stat-get stats "found")))
-                       (concat "unmatched:         " (number-to-string (stat-get stats "not_found"))
-                               "  (see unmatched.txt)")
-                       (concat "broken links:      " (number-to-string (stat-get stats "broken_links"))
-                               "  (see broken-links.txt)")
-                       (concat "distinct notes:    " (number-to-string (stat-get stats "distinct_notes")))))))
+                 (list (concat "Ulysses, annotated — build report — " date)
+                       ""
+                       "This edition is built by matching the annotations published at"
+                       "joyceproject.com against the Project Gutenberg text of Ulysses."
+                       ""
+                       (concat "   Annotations available ......... " total)
+                       (concat "   Placed in the text ............ " (number-to-string (stat-get stats "found")))
+                       (concat "   Could not be placed ........... " (number-to-string (stat-get stats "not_found")))
+                       (concat "   Note could not be read ........ " (number-to-string (stat-get stats "broken_links")))
+                       (concat "   Distinct notes in the book .... " (number-to-string (stat-get stats "distinct_notes")))
+                       ""
+                       "Details for the skipped ones:"
+                       "   https://shsms.github.io/ulysses-annotated/badges/unmatched.txt"
+                       "   https://shsms.github.io/ulysses-annotated/badges/broken-links.txt"
+                       ""
+                       "Read the book online:"
+                       "   https://shsms.github.io/ulysses-annotated/"))))
 
 ;; Error out if STATS' STAT-KEY count exceeds the --PCT-ARG percentage of the
 ;; total references (defaulting to DEFAULT-PCT when the arg is absent).
