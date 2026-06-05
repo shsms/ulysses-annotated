@@ -3,7 +3,7 @@
 ;;;
 ;;;   mime run add-anno.tl --infile IN --outfile OUT \
 ;;;       --colour_outfile COUT --anno_path DIR --date DATE \
-;;;       [--templates_path DIR] [--max_unmatched_pct N] [--with_badges 1]
+;;;       [--templates_path DIR] [--max_unmatched_pct N] [--max_broken_pct N] [--with_badges 1]
 ;;;
 ;;; Run from this directory: modules and templates load by relative path.
 
@@ -98,22 +98,28 @@
       (insert (badge_json "distinct notes" (stat-get stats "distinct_notes") colour))
       (write-file "badge-distinct.json"))))
 
-;; Fail the build when too many references went unmatched: error out if the
-;; unmatched count exceeds --max_unmatched_pct of the total (default 10).
-(defun check-unmatched (stats)
+;; Error out if STATS' STAT-KEY count exceeds the --PCT-ARG percentage of the
+;; total references (defaulting to DEFAULT-PCT when the arg is absent).
+(defun check-pct (stats stat-key label pct-arg default-pct)
   (let* ((total (stat-get stats "total"))
-         (unmatched (stat-get stats "not_found"))
-         (max-pct (if (arg "max_unmatched_pct")
-                      (string-to-number (arg "max_unmatched_pct")) 10)))
-    (when (and (> total 0) (> (* 100 unmatched) (* max-pct total)))
-      (error (concat "too many unmatched references: " (number-to-string unmatched) "/"
+         (count (stat-get stats stat-key))
+         (max-pct (if (arg pct-arg) (string-to-number (arg pct-arg)) default-pct)))
+    (when (and (> total 0) (> (* 100 count) (* max-pct total)))
+      (error (concat "too many " label ": " (number-to-string count) "/"
                      (number-to-string total) " exceeds " (number-to-string max-pct) "%")))))
+
+;; Fail the build when too many references went unmatched or had a broken note.
+;; Each ceiling defaults to 10% of the total; override with --max_unmatched_pct
+;; / --max_broken_pct.
+(defun check-thresholds (stats)
+  (check-pct stats "not_found" "unmatched references" "max_unmatched_pct" 10)
+  (check-pct stats "broken_links" "broken links" "max_broken_pct" 10))
 
 (defun main ()
   (when (arg "templates_path") (setq templates-path (arg "templates_path")))
   (make_epub nil (arg "outfile"))
   (let ((stats (make_epub t (arg "colour_outfile"))))
     (when (arg "with_badges") (make_badges stats))
-    (check-unmatched stats)))
+    (check-thresholds stats)))
 
 (main)
