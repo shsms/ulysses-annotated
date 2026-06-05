@@ -107,11 +107,13 @@
     (kill-buffer buf)))
 
 ;; An annotation's link text, made readable: markup stripped, no-break spaces
-;; normalised, trimmed, quoted; the empty case named in words.
+;; normalised, &amp; decoded (the one entity fix-basics leaves alone), trimmed,
+;; quoted; the empty case named in words.
 (defun clean-passage (text)
   (let ((plain (string-trim
-                (replace-regexp-in-string "\\x{00A0}" " "
-                                          (replace-regexp-in-string "<[^>]+>" "" text)))))
+                (string-replace "&amp;" "&"
+                                (replace-regexp-in-string "\\x{00A0}" " "
+                                                          (replace-regexp-in-string "<[^>]+>" "" text))))))
     (if (string= plain "") "(this annotation has no visible text)"
       (concat "\"" plain "\""))))
 
