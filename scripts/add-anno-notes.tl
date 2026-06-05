@@ -233,7 +233,8 @@
 ;; point; both are markers in the epub. The per-chapter base-text slice is bounded
 ;; by an explicit CHAP-END marker rather than a narrowing.
 (defun add-notes (epub main-mark notes-mark use-colour notes-box stats)
-  (let ((total 0) (found 0) (not-found 0) (annotation-failures 0) (chapter 0))
+  (let ((total 0) (found 0) (not-found 0) (annotation-failures 0) (chapter 0)
+        (unmatched-list nil) (broken-list nil))
     (while (< chapter 18)
       ;; the chapter's "[ N ]" heading into the Annotations section
       (with-current-buffer epub
@@ -275,11 +276,18 @@
                         (setq found (1+ found))
                         (setq note-num (1+ note-num)))
                     (message (concat "annotation_failed-" (nth chapter chapters) ": " text))
+                    (setq broken-list
+                          (cons (concat (nth chapter chapter-names) ": \"" text "\" -> " url)
+                                broken-list))
                     (setq annotation-failures (1+ annotation-failures))))
               (with-current-buffer epub
                 (goto-char main-mark)
                 (let ((ctx (buffer-substring (point) (min (point-max) (+ (point) 100)))))
                   (message (concat "text_not_found-" (nth chapter chapters) ": " text " || base: " ctx))))
+              (setq unmatched-list
+                    (cons (concat (nth chapter chapter-names) ": "
+                                  (if (string= (string-trim text) "") "(empty link text)" text))
+                          unmatched-list))
               (setq not-found (1+ not-found))))))
       (setq chapter (1+ chapter)))
     (message (concat "total:" (number-to-string total)))
@@ -288,7 +296,9 @@
     (stat-set stats "total" total)
     (stat-set stats "found" found)
     (stat-set stats "not_found" not-found)
-    (stat-set stats "broken_links" annotation-failures)))
+    (stat-set stats "broken_links" annotation-failures)
+    (stat-set stats "unmatched_list" (reverse unmatched-list))
+    (stat-set stats "broken_list" (reverse broken-list))))
 
 ;; ---- alphabetical "Index of Notes" ------------------------------------------
 (defun add-notes-index (epub notes-box index-mark notes-mark stats)

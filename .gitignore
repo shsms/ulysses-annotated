@@ -9,3 +9,6 @@ scripts/annotations-raw
 /ulysses-annotated.epub
 /ulysses-annotated-monochrome.epub
 scripts/badge-*.json
+scripts/unmatched.txt
+scripts/broken-links.txt
+scripts/build-report.txt

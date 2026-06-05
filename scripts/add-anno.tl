@@ -98,6 +98,41 @@
       (insert (badge_json "distinct notes" (stat-get stats "distinct_notes") colour))
       (write-file "badge-distinct.json"))))
 
+;; Write FILENAME as HEADER, a blank line, then LINES one per line.
+(defun write-lines (filename header lines)
+  (let ((buf (generate-new-buffer "details")))
+    (with-current-buffer buf
+      (insert header)
+      (insert "\n\n")
+      (dolist (l lines) (insert l) (insert "\n"))
+      (write-file filename))
+    (kill-buffer buf)))
+
+;; The detail files the README badges link to: the unmatched and broken-link
+;; lists, plus the run summary that the success badges point at.
+(defun make-details (stats)
+  (let ((total (number-to-string (stat-get stats "total")))
+        (date (if (arg "date") (arg "date") "(undated)")))
+    (write-lines "unmatched.txt"
+                 (concat "Unmatched references — "
+                         (number-to-string (stat-get stats "not_found"))
+                         " of " total " — " date)
+                 (stat-get stats "unmatched_list"))
+    (write-lines "broken-links.txt"
+                 (concat "Broken links (reference matched, note unusable) — "
+                         (number-to-string (stat-get stats "broken_links"))
+                         " of " total " — " date)
+                 (stat-get stats "broken_list"))
+    (write-lines "build-report.txt"
+                 (concat "ulysses-annotated build report — " date)
+                 (list (concat "total references:  " total)
+                       (concat "matched:           " (number-to-string (stat-get stats "found")))
+                       (concat "unmatched:         " (number-to-string (stat-get stats "not_found"))
+                               "  (see unmatched.txt)")
+                       (concat "broken links:      " (number-to-string (stat-get stats "broken_links"))
+                               "  (see broken-links.txt)")
+                       (concat "distinct notes:    " (number-to-string (stat-get stats "distinct_notes")))))))
+
 ;; Error out if STATS' STAT-KEY count exceeds the --PCT-ARG percentage of the
 ;; total references (defaulting to DEFAULT-PCT when the arg is absent).
 (defun check-pct (stats stat-key label pct-arg default-pct)
@@ -122,7 +157,9 @@
   (when (arg "templates_path") (setq templates-path (arg "templates_path")))
   (make_epub nil (arg "outfile"))
   (let ((stats (make_epub t (arg "colour_outfile"))))
-    (when (arg "with_badges") (make_badges stats))
+    (when (arg "with_badges")
+      (make_badges stats)
+      (make-details stats))
     (check-thresholds stats)))
 
 (main)
