@@ -14,10 +14,16 @@
 ;; Visit the input as the current buffer; the reconciliations below run on it.
 (find-file (arg "infile"))
 
-(let ((misses 0))
+;; On a failed run the CLI emits only the error string (reports and the message
+;; log are dropped), so the error itself must carry the diagnostics.
+(let ((misses 0) (first-miss nil))
   (dolist (i items)
-    (if (update (car i) (cdr i)) nil (setq misses (1+ misses))))
+    (if (update (car i) (cdr i)) nil
+      (setq misses (1+ misses))
+      (when (not first-miss) (setq first-miss (car i)))))
   (report "applied" (- (length items) misses))
   (report "misses" misses)
   (if (= misses 0) (write-file (arg "outfile"))
-    (error "some diffs did not match the base; output not written")))
+    (error (concat (number-to-string misses) " of " (number-to-string (length items))
+                   " reconciliations did not match the base (first: \"" first-miss
+                   "\"); output not written"))))
