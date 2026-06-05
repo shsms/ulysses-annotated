@@ -58,8 +58,11 @@
   ;; some files have extra nested divs
   (goto-char (point-min))
   (replace-string "<div id=\"note2\">" "")
+  (goto-char (point-min))
   (replace-string "<div id=\"note\">" "")
+  (goto-char (point-min))
   (replace-string "<div>" "")
+  (goto-char (point-min))
   (replace-string "</div>" "")
   (goto-char (point-min))
   (when (not (re-search-forward "<p[ >]" nil t))
