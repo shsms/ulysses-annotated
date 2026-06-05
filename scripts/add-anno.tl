@@ -108,10 +108,13 @@
       (error (concat "too many " label ": " (number-to-string count) "/"
                      (number-to-string total) " exceeds " (number-to-string max-pct) "%")))))
 
-;; Fail the build when too many references went unmatched or had a broken note.
-;; Each ceiling defaults to 10% of the total; override with --max_unmatched_pct
-;; / --max_broken_pct.
+;; Fail the build when no references were processed at all, or when too many
+;; went unmatched or had a broken note. Each ceiling defaults to 10% of the
+;; total; override with --max_unmatched_pct / --max_broken_pct.
 (defun check-thresholds (stats)
+  (let ((total (stat-get stats "total")))
+    (when (or (not total) (= total 0))
+      (error "no annotation references were processed; output is unannotated")))
   (check-pct stats "not_found" "unmatched references" "max_unmatched_pct" 10)
   (check-pct stats "broken_links" "broken links" "max_broken_pct" 10))
 
