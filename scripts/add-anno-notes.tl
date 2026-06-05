@@ -152,7 +152,12 @@
   (let ((hit (assoc filename (car *note-cache*))))
     (if hit
         (cdr hit)
-      (let ((result (compute-note-components filename)))
+      ;; A malformed note (an erroring search inside compute-note-components) is
+      ;; caught here and cached as 'failed, so one bad file becomes a counted
+      ;; broken link instead of a crashed build.
+      (let ((result (condition-case e (compute-note-components filename)
+                      (error (message (concat "error: malformed note skipped: " filename))
+                             'failed))))
         (setcar *note-cache* (cons (cons filename result) (car *note-cache*)))
         result))))
 
