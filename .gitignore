@@ -1,2 +1,14 @@
 scripts/annotations-raw
 4300-h/4300-h-annotated.*
+
+# Downloaded mime binary and release tarballs
+/mime
+/mime-*.tar.gz
+
+# Build outputs
+/ulysses-annotated.epub
+/ulysses-annotated-monochrome.epub
+scripts/badge-*.json
+scripts/unmatched.txt
+scripts/broken-links.txt
+scripts/build-report.txt

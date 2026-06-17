@@ -1,16 +1,21 @@
 #!/bin/bash
+# Halt on the first failure: a non-zero mime/ebookmaker exit must not let the
+# rest of the pipeline run on stale or missing intermediates.
+set -euo pipefail
 
 date=$(bash -c "LC_ALL=en_GB.utf8 date '+%B %d, %Y'")
 
 cd scripts
-mime upd-epub-to-jp.mime --infile ../4300-h/4300-h.htm --outfile updated-to-jp.htm
-mime add-anno.mime --date "${date}" --anno_path /datadir/annotations-raw/ --infile updated-to-jp.htm --outfile annotated.htm --colour_outfile colour_annotated.htm
+mime run upd-epub-to-jp.tl --infile ../4300-h/4300-h.htm --outfile updated-to-jp.htm </dev/null
+mime run add-anno.tl --date "${date}" --anno_path /datadir/annotations-raw --infile updated-to-jp.htm --outfile annotated.htm --colour_outfile colour_annotated.htm --max_unmatched_pct "${MAX_UNMATCHED_PCT:-10}" --max_broken_pct "${MAX_BROKEN_PCT:-10}" </dev/null
 
+# Output names follow the Makefile/CI convention: the unqualified name is the
+# colour edition, "-monochrome" the mono one.
 ebookmaker \
 	--make epub.images \
 	--title Ulysses \
 	--author "James Joyce" \
-	--output-file /datadir/ulysses-annotated.epub \
+	--output-file /datadir/ulysses-annotated-monochrome.epub \
 	--cover ../cover-monochrome.jpg \
 	annotated.htm
 
@@ -18,7 +23,11 @@ ebookmaker \
 	--make epub.images \
 	--title Ulysses \
 	--author "James Joyce" \
-	--output-file /datadir/ulysses-annotated-colour.epub \
+	--output-file /datadir/ulysses-annotated.epub \
 	--cover ../cover.jpg \
 	colour_annotated.htm
 
+# ebookmaker's epub.images make-type writes "<output-file>-images-epub.epub";
+# rename to the expected filenames (as the Makefile's epub target does).
+mv /datadir/ulysses-annotated-monochrome.epub-images-epub.epub /datadir/ulysses-annotated-monochrome.epub
+mv /datadir/ulysses-annotated.epub-images-epub.epub /datadir/ulysses-annotated.epub
