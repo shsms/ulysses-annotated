@@ -1,0 +1,17 @@
+Ulysses, annotated — build report — September 06, 2026
+
+This edition is built by matching the annotations published at
+joyceproject.com against the Project Gutenberg text of Ulysses.
+
+   Annotations available ......... 4649
+   Placed in the text ............ 4616
+   Could not be placed ........... 23
+   Note could not be read ........ 10
+   Distinct notes in the book .... 1217
+
+Details for the skipped ones:
+   https://shsms.github.io/ulysses-annotated/badges/unmatched.txt
+   https://shsms.github.io/ulysses-annotated/badges/broken-links.txt
+
+Read the book online:
+   https://shsms.github.io/ulysses-annotated/

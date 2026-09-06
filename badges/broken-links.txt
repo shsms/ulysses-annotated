@@ -1,0 +1,47 @@
+Annotations whose note could not be read — 10 of 4649 — September 06, 2026
+
+The highlighted passage was found in the book, but the note that
+should open there could not be read from the joyceproject.com
+download, so the note marker was left out. The note's file name is
+included in case someone wants to report it.
+
+1. Episode:      Telemachus
+   Highlighted:  "old Royce sing"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
+2. Episode:      Telemachus
+   Highlighted:  "in the pantomime of Turko the terrible"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
+3. Episode:      Calypso
+   Highlighted:  "Turko the terrible"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
+4. Episode:      Lestrygonians
+   Highlighted:  "Goose green"
+   Note file:    notes/Wz6665oBzEz5M_VgGg2t.htm
+
+5. Episode:      Wandering Rocks
+   Highlighted:  "Father Conmee read in secret Pater and Ave and crossed his breast. Deus in adiutorium."
+   Note file:    notes/Wz6665oBzEz5M_VgGg2t.htm
+
+6. Episode:      Wandering Rocks
+   Highlighted:  "He walked calmly and read mutely the nones, walking and reading till he came to Res in Beati immaculati: Principium verborum tuorum veritas: in eternum omnia indicia iustitiæ tuæ."
+   Note file:    notes/Wz6665oBzEz5M_VgGg2t.htm
+
+7. Episode:      Wandering Rocks
+   Highlighted:  "Father Conmee blessed both gravely and turned a thin page of his breviary. Sin: Principes persecuti sunt me gratis: et a verbis tuis formidavit cor meum."
+   Note file:    notes/Wz6665oBzEz5M_VgGg2t.htm
+
+8. Episode:      Circe
+   Highlighted:  "panto boys"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
+9. Episode:      Circe
+   Highlighted:  "Turko the terrible"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
+10. Episode:      Ithaca
+   Highlighted:  "the sixth scene, the valley of diamonds, of the second edition (30 January 1893) of the grand annual Christmas pantomime Sinbad the Sailor"
+   Note file:    notes/lE-bJZUBeQi-aLQfd6-b.htm
+
